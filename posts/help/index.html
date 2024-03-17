@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
-        <title>使用gohugo搭建简易个人博客(mac教程) - 魚的个人博客</title><meta name="Description" content="魚的个人博客"><meta property="og:title" content="使用gohugo搭建简易个人博客(mac教程)" />
+        <title>使用gohugo搭建简易个人博客(mac教程) - 魚的个人博客</title><meta name="Description" content="This is my cool site"><meta property="og:title" content="使用gohugo搭建简易个人博客(mac教程)" />
 <meta property="og:description" content="安装hugo：
 brew install hugo 可以用brew list hugo查看安装位置，可以用hugo version查看信息
 建立网站：先准备好一个文件夹，cd到里面，然后
@@ -18,12 +18,11 @@ hugo --theme=LoveIt --baseURL=&#34;https://zcralx.github.io/&#34; --buildDrafts 
 托管到github：创建一个仓库，命名xxx.github.io。在终端cd到public目录下，一步一步git(命令在个人仓库里有提示)
 git init git add . git commit -m &#34;first commit&#34; git remote add origin https://github.com/zcralx/zcralx.github.io.git git push -u origin main 最后一句执行完后会让输入账号密码，账号就是github名字，密码是自己设置的令牌（现在不支持密码登录了），注意mac用户需要在钥匙串里把github密码改为令牌才能提交。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/posts/help/" /><meta property="og:image" content="http://localhost:1313/static/01.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="http://localhost:1313/posts/help/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-03-17T12:47:39+08:00" />
-<meta property="article:modified_time" content="2024-03-17T12:47:39+08:00" /><meta property="og:site_name" content="魚的个人博客" />
+<meta property="article:modified_time" content="2024-03-17T12:47:39+08:00" /><meta property="og:site_name" content="My cool site" />
 
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="http://localhost:1313/static/01.png" /><meta name="twitter:title" content="使用gohugo搭建简易个人博客(mac教程)"/>
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="使用gohugo搭建简易个人博客(mac教程)"/>
 <meta name="twitter:description" content="安装hugo：
 brew install hugo 可以用brew list hugo查看安装位置，可以用hugo version查看信息
 建立网站：先准备好一个文件夹，cd到里面，然后
@@ -39,9 +38,9 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
 <meta name="application-name" content="My cool site">
 <meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/help/" /><link rel="prev" href="http://localhost:1313/posts/ruiintroduction/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/help/" /><link rel="prev" href="http://localhost:1313/posts/ruiintroduction/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
@@ -64,7 +63,14 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
         <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
     <div class="header-wrapper">
         <div class="header-title">
-            <a href="/" title="魚的个人博客">My cool site</a>
+            <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-1" class="typeit"></span></a>
         </div>
         <div class="menu">
             <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
@@ -87,7 +93,14 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
     <div class="header-container">
         <div class="header-wrapper">
             <div class="header-title">
-                <a href="/" title="魚的个人博客">My cool site</a>
+                <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-2" class="typeit"></span></a>
             </div>
             <div class="menu-toggle" id="menu-toggle-mobile">
                 <span></span><span></span><span></span>
@@ -126,7 +139,7 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
             <div class="post-meta-line"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-03-17">2024-03-17</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;53 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  data-kept="">
+        </div><div class="details toc" id="toc-static"  data-kept="true">
                 <div class="details-summary toc-title">
                     <span>Contents</span>
                     <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
@@ -179,7 +192,7 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
         <div class="post-info-line">
             <div class="post-info-md"></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/help/"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i data-svg-src="/lib/simple-icons/icons/line.min.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/help/"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/help/" data-title="使用gohugo搭建简易个人博客(mac教程)"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
             </div>
         </div>
     </div>
@@ -193,10 +206,11 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
 
     <div class="post-nav"><a href="/posts/ruiintroduction/" class="prev" rel="prev" title="RuiIntroduction"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>RuiIntroduction</a></div>
 </div>
-</article></div>
+<div id="comments"><div id="gitalk" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://github.com/gitalk/gitalk"></a>Gitalk</a>.
+            </noscript></div></article></div>
             </main><footer class="footer">
-        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.123.8">Hugo</a> | Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="sb.com" target="_blank">天水的魚</a></span></div>
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="sb.com" target="_blank">天水的魚</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
         </div>
     </footer></div>
 
@@ -205,5 +219,5 @@ git init git add . git commit -m &#34;first commit&#34; git remote add origin ht
             </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
                 <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
             </a>
-        </div><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.5.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/typeit@8.6.0/dist/index.umd.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"gitalk":{"admin":[""],"clientID":"","clientSecret":"","id":"2024-03-17T12:47:39+08:00","owner":"","repo":"","title":"使用gohugo搭建简易个人博客(mac教程)"}},"data":{"id-1":"魚的个人博客","id-2":"魚的个人博客"},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"},"twemoji":true,"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
 </html>

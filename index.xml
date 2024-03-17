@@ -2,7 +2,7 @@
     <channel>
         <title>魚的个人博客</title>
         <link>http://localhost:1313/</link>
-        <description>魚的个人博客</description>
+        <description>This is my cool site</description>
         <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>zcralx8850@outlook.com (天水的魚)</managingEditor>
             <webMaster>zcralx8850@outlook.com (天水的魚)</webMaster><lastBuildDate>Sun, 17 Mar 2024 12:47:39 &#43;0800</lastBuildDate>
             <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />

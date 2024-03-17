@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title> - 魚的个人博客</title><meta name="Description" content="This is my cool site"><meta property="og:title" content="" />
+<meta property="og:description" content="Stream流式编程 [TOC]
+了解Stream Stream 是 Java8 添加的一个新的抽象称为流，可以让你以一种声明的方式处理数据。通过使用流，我们可以说明想要完成什么任务，而不是说明如何去实现它。我们将操作的调度留给具体实现去解决。例如，假设我们想要计算某个属性的平均值，那么我们就可以指定数据源和该属性，然后，流库就可以对计算进行优化，例如，使用多线程来计算总和与个数，并将结果合并。 Stream 可以极大提高Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。 Stream 流的操作是以管道的方式串起来的。管道以数据源开始，包含若干个中间操作，最终以终点操作结束(规约操作）。 流并不存储其元素。这些元素可能存储在底层的集合中，或者是按需生成的。 流的操作不会修改其数据源。例如，filter 方法不会从流中移除元素，而是会生成一 个新的流，其中不包含被过滤掉的元素。 流的操作是尽可能惰性执行的。这意味着直至需要其结果时，操作才会执行。因此，我们甚至可以操作无限流。 操作流的典型流程 建立一个包含三个阶段的操作管道：
+创建一个流 指定将初始流转换为其他流的中间操作，可能有多个中间操作 归约操作，产生结果，此操作会强制执行之前的惰性操作，然后这个流就再也无法使用了 创建流 使用Collection接口的stream方法将任何集合转换为流：
+default Stream&lt;E&gt; stream() { return StreamSupport.stream(spliterator(), false); } /*spliterator是一个实际的 Spliterator 对象，它代表了可以被分割和遍历的数据源; false表示是否应该创建一个并行流（parallel stream）。在这个例子中传入的是 false，意味着创建的是一个顺序流，这意味着流的操作将在当前线程上按照元素的自然顺序逐个进行处理。*/ List&lt;String&gt; list = Arrays.asList(&#34;1ded&#34;,&#34;2cec&#34;,&#34;2dc&#34;,&#34;4vv&#34;,&#34;4vrv&#34;); list.stream().filter(s -&gt; s.startsWith(&#34;2&#34;)).forEach(System.out::println); //2cec 2dc Stream接口的of方法：
+public static&lt;T&gt; Stream&lt;T&gt; of(T... values/*可变参数可看作数组*/) { return Arrays.stream(values); //实际上就是return StreamSupport.stream(spliterator(array, startInclusive, endExclusive), false); } Stream&lt;String&gt; str = Stream.of(&#34;abx&#34;,&#34;asac&#34;,&#34;sad&#34;); //创建不包含任何元素的流：Stream.empty(); //进入Arrays类的stream方法内部： public static &lt;T&gt; Stream&lt;T&gt; stream(T[] array) { return stream(array, 0, array." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" /><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="My cool site" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="Stream流式编程 [TOC]
+了解Stream Stream 是 Java8 添加的一个新的抽象称为流，可以让你以一种声明的方式处理数据。通过使用流，我们可以说明想要完成什么任务，而不是说明如何去实现它。我们将操作的调度留给具体实现去解决。例如，假设我们想要计算某个属性的平均值，那么我们就可以指定数据源和该属性，然后，流库就可以对计算进行优化，例如，使用多线程来计算总和与个数，并将结果合并。 Stream 可以极大提高Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。 Stream 流的操作是以管道的方式串起来的。管道以数据源开始，包含若干个中间操作，最终以终点操作结束(规约操作）。 流并不存储其元素。这些元素可能存储在底层的集合中，或者是按需生成的。 流的操作不会修改其数据源。例如，filter 方法不会从流中移除元素，而是会生成一 个新的流，其中不包含被过滤掉的元素。 流的操作是尽可能惰性执行的。这意味着直至需要其结果时，操作才会执行。因此，我们甚至可以操作无限流。 操作流的典型流程 建立一个包含三个阶段的操作管道：
+创建一个流 指定将初始流转换为其他流的中间操作，可能有多个中间操作 归约操作，产生结果，此操作会强制执行之前的惰性操作，然后这个流就再也无法使用了 创建流 使用Collection接口的stream方法将任何集合转换为流：
+default Stream&lt;E&gt; stream() { return StreamSupport.stream(spliterator(), false); } /*spliterator是一个实际的 Spliterator 对象，它代表了可以被分割和遍历的数据源; false表示是否应该创建一个并行流（parallel stream）。在这个例子中传入的是 false，意味着创建的是一个顺序流，这意味着流的操作将在当前线程上按照元素的自然顺序逐个进行处理。*/ List&lt;String&gt; list = Arrays.asList(&#34;1ded&#34;,&#34;2cec&#34;,&#34;2dc&#34;,&#34;4vv&#34;,&#34;4vrv&#34;); list.stream().filter(s -&gt; s.startsWith(&#34;2&#34;)).forEach(System.out::println); //2cec 2dc Stream接口的of方法：
+public static&lt;T&gt; Stream&lt;T&gt; of(T... values/*可变参数可看作数组*/) { return Arrays.stream(values); //实际上就是return StreamSupport.stream(spliterator(array, startInclusive, endExclusive), false); } Stream&lt;String&gt; str = Stream.of(&#34;abx&#34;,&#34;asac&#34;,&#34;sad&#34;); //创建不包含任何元素的流：Stream.empty(); //进入Arrays类的stream方法内部： public static &lt;T&gt; Stream&lt;T&gt; stream(T[] array) { return stream(array, 0, array."/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" /><link rel="next" href="http://localhost:1313/posts/ruiintroduction/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:1313\/posts\/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B\/"
+        },"genre": "posts","wordcount":  210 ,
+        "url": "http:\/\/localhost:1313\/posts\/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "天水的魚"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-1" class="typeit"></span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-2" class="typeit"></span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;210 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#了解stream">了解Stream</a></li>
+    <li><a href="#操作流的典型流程">操作流的典型流程</a></li>
+    <li><a href="#创建流">创建流</a>
+      <ul>
+        <li><a href="#创建无限流">创建无限流</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="stream流式编程">Stream流式编程</h1>
+<p>[TOC]</p>
+<h2 id="了解stream">了解Stream</h2>
+<ul>
+<li>Stream 是 Java8 添加的一个新的抽象称为流，可以让你以一种声明的方式处理数据。通过使用流，我们可以说明想要完成什么任务，而不是说明如何去实现它。我们将操作的调度留给具体实现去解决。例如，假设我们想要计算某个属性的平均值，那么我们就可以指定数据源和该属性，然后，流库就可以对计算进行优化，例如，使用多线程来计算总和与个数，并将结果合并。</li>
+<li>Stream 可以极大提高Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。</li>
+<li>Stream 流的操作是以管道的方式串起来的。管道以数据源开始，包含若干个中间操作，最终以终点操作结束(规约操作）。</li>
+<li>流并不存储其元素。这些元素可能存储在底层的集合中，或者是按需生成的。</li>
+<li>流的操作不会修改其数据源。例如，filter 方法不会从流中移除元素，而是会生成一 个新的流，其中不包含被过滤掉的元素。</li>
+<li>流的操作是尽可能惰性执行的。这意味着直至需要其结果时，操作才会执行。因此，我们甚至可以操作无限流。</li>
+</ul>
+<h2 id="操作流的典型流程">操作流的典型流程</h2>
+<p>建立一个包含三个阶段的操作管道：</p>
+<ol>
+<li>创建一个流</li>
+<li>指定将初始流转换为其他流的中间操作，可能有多个中间操作</li>
+<li>归约操作，产生结果，此操作会强制执行之前的惰性操作，然后这个流就再也无法使用了</li>
+</ol>
+<h2 id="创建流">创建流</h2>
+<ol>
+<li>
+<p>使用Collection接口的stream方法将任何集合转换为流：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="k">default</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">stream</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">spliterator</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cm">/*spliterator是一个实际的 Spliterator 对象，它代表了可以被分割和遍历的数据源;
+</span></span></span><span class="line"><span class="cl"><span class="cm">false表示是否应该创建一个并行流（parallel stream）。在这个例子中传入的是 false，意味着创建的是一个顺序流，这意味着流的操作将在当前线程上按照元素的自然顺序逐个进行处理。*/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&#34;1ded&#34;</span><span class="p">,</span><span class="s">&#34;2cec&#34;</span><span class="p">,</span><span class="s">&#34;2dc&#34;</span><span class="p">,</span><span class="s">&#34;4vv&#34;</span><span class="p">,</span><span class="s">&#34;4vrv&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">list</span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">filter</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)).</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//2cec    2dc</span><span class="w">
+</span></span></span></code></pre></div></li>
+<li>
+<p>Stream接口的of方法：</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">of</span><span class="p">(</span><span class="n">T</span><span class="p">...</span><span class="w"> </span><span class="n">values</span><span class="cm">/*可变参数可看作数组*/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">values</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//实际上就是return StreamSupport.stream(spliterator(array, startInclusive, endExclusive), false);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Stream</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&#34;abx&#34;</span><span class="p">,</span><span class="s">&#34;asac&#34;</span><span class="p">,</span><span class="s">&#34;sad&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//创建不包含任何元素的流：Stream.empty();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//进入Arrays类的stream方法内部：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span><span class="n">T</span><span class="o">[]</span><span class="w"> </span><span class="n">array</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">stream</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="n">array</span><span class="p">.</span><span class="na">length</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//这也是一种创建流的方式</span><span class="w">
+</span></span></span></code></pre></div><h3 id="创建无限流">创建无限流</h3>
+<p>Stream接口有两个创建无限流的静态方法：</p>
+<ol>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">Supplier</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">s</span><span class="cm">/*用于提供Stream中的元素,反复调用函数s*/</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Objects</span><span class="p">.</span><span class="na">requireNonNull</span><span class="p">(</span><span class="n">s</span><span class="p">);</span><span class="c1">//确保传入的Supplier不为空</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">				</span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">new</span><span class="w"> </span><span class="n">StreamSpliterators</span><span class="p">.</span><span class="na">InfiniteSupplyingSpliterator</span><span class="p">.</span><span class="na">OfRef</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">Long</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="c1">//new StreamSpliterators.InfiniteSupplyingSpliterator.OfRef&lt;&gt;(Long.MAX_VALUE, s)用于创建一个无限的SupplyingSpliterator，其中s用于提供元素。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">0</span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 创建一个无限递增的整数流</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">infiniteIntegers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Stream</span><span class="p">.</span><span class="na">generate</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">count</span><span class="o">[</span><span class="n">0</span><span class="o">]++</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 取前10个整数打印</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">infiniteIntegers</span><span class="p">.</span><span class="na">limit</span><span class="p">(</span><span class="n">10</span><span class="p">).</span><span class="na">forEach</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><p>无论何时，只要需要 一个流类型的值，该函数就会被调用以产生一个这样的值。</p>
+</li>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">iterate</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">seed</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">UnaryOperator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Objects</span><span class="p">.</span><span class="na">requireNonNull</span><span class="p">(</span><span class="n">f</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Spliterator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">spliterator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Spliterators</span><span class="p">.</span><span class="na">AbstractSpliterator</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">Long</span><span class="p">.</span><span class="na">MAX_VALUE</span><span class="p">,</span><span class="n">Spliterator</span><span class="p">.</span><span class="na">ORDERED</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Spliterator</span><span class="p">.</span><span class="na">IMMUTABLE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="cm">/*匿名类*/</span><span class="w">					
+</span></span></span><span class="line"><span class="cl"><span class="w">  					</span><span class="n">T</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">						</span><span class="kt">boolean</span><span class="w"> </span><span class="n">started</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//Spliterator实现了tryAdvance方法，每次调用该方法时，会将序列中的下一个元素传递给给定的Consumer行动，并返回true。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nd">@Override</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">tryAdvance</span><span class="p">(</span><span class="n">Consumer</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">super</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">Objects</span><span class="p">.</span><span class="na">requireNonNull</span><span class="p">(</span><span class="n">action</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">T</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">started</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="na">apply</span><span class="p">(</span><span class="n">prev</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seed</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">started</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">action</span><span class="p">.</span><span class="na">accept</span><span class="p">(</span><span class="n">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">StreamSupport</span><span class="p">.</span><span class="na">stream</span><span class="p">(</span><span class="n">spliterator</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>如何利用iterate方法产生一个有限的序列呢？添加一个谓词（Predicate）来描述迭代应该如何结束</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">static</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">iterate</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">seed</span><span class="p">,</span><span class="w"> </span><span class="n">Predicate</span><span class="o">&lt;?</span><span class="w"> </span><span class="kd">super</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hasNext</span><span class="p">,</span><span class="w"> </span><span class="n">UnaryOperator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">next</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BigInteger</span><span class="p">(</span><span class="s">&#34;10000&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">BigInteger</span><span class="o">&gt;</span><span class="w"> </span><span class="n">integers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Stream</span><span class="p">.</span><span class="na">iterate</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">ZERO</span><span class="p">,</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">n</span><span class="w"> </span><span class="o">-&gt;</span><span class="n">n</span><span class="p">.</span><span class="na">compareTo</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">.</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="w"> </span><span class="n">ONE</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//该序列中的第一个元素是种子BigInteger.ZERO，第 二个元素是f(seed)，即1(作为大整数)，下一个元素是f(f(seed)，即2，后续以此类推。   只要该谓词拒绝了某个选代生成的值，这个流即结束</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ol>
+<p>待续。。。。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 0001-01-01</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" data-title=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" data-title=""><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" data-title=""><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+            <a href="/posts/ruiintroduction/" class="next" rel="next" title="RuiIntroduction">RuiIntroduction<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="sb.com" target="_blank">天水的魚</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/twemoji/twemoji.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/typeit/index.umd.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"data":{"id-1":"魚的个人博客","id-2":"魚的个人博客"},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"},"twemoji":true,"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

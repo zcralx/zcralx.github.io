@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>JVM和Java多线程 - 魚的个人博客</title><meta name="Description" content="This is my cool site"><meta property="og:title" content="JVM和Java多线程" />
+<meta property="og:description" content="JVM和Java多线程 [TOC]
+JVM的运行机制及基本原理 ​	当前市面上使用范围最广的，是Sun/OracleJDK或者OpenJDK中默认的 HotSpot 虚拟机。市面上还存在很多非常优秀的Java虚拟机，它们都遵循Java虚拟机规范，但具体的实现上各有特点，在某一个领域拥有突出的性能优势是它们最重要的卖点。例如IBM的J9，Azul Systems 的 Azul VM 等等。
+JVM的生命周期 ​	JVM在Java程序开始运行的时候，它才运行，程序结束的时它就停止。
+一个Java程序会开启一个JVM进程，如果一台机器上运行3个Java程序，那么就会有3个运行中的JVM进程。
+JVM中的线程分为两种：守护线程和普通线程
+守护线程是JVM自己使用的线程，比如垃圾回收（GC）就是一个守护线程。
+普通线程一般是Java程序的线程，只要JVM中有普通线程在执行，那么JVM就不会停止。
+在如下几种情况下，Java虚拟机将结束生命周期：
+1、执行了System.exit()方法
+2、程序正常执行结束
+3、程序在执行过程中遇到了异常或错误而终止进程
+4、由于操作系统出现错误而导致Java虚拟机进程终止
+JVM的结构体系 Class文件 ​	Class文件由Java编译器生成，我们创建的.Java文件在经过编译器后，会变成.Class的文件，这样才能被JVM所识别并运行。
+​	Class文件的核心设计思想是 平台无关性，它存储的不是操作系统可以直接识别的二进制本地机器码，而是根据Java虚拟机规范所自定义的指令集、符号表和一些其他信息，所以只要任何一个操作系统下开发有对应的Java虚拟机，开发者的Java程序就能跑起来。
+查看Class文件（二进制）
+xxd Hello.class Class文件组成 详见：https://javabetter.cn/jvm/class-file-jiegou.html
+魔数（cafebabe）
+第一行中有一串特殊的字符 cafebabe，它就是一个魔数，是 JVM 识别 class 文件的标志，JVM 会在验证阶段检查 class 文件是否以该魔数开头，如果不是则会抛出 ClassFormatError。
+版本号
+紧跟着魔数后面的四个字节 0000 0037 分别表示副版本号和主版本号。也就是说，主版本号为 55（0x37 的十进制），也就是 Java 11 对应的版本号，副版本号为 0。
+常量池
+紧跟在版本号之后的是常量池，它包含了类、接口、字段和方法的符号引用，以及字符串字面量和数值常量。这些信息在编译时被创建，并在运行时被Java虚拟机（JVM）使用。
+访问标记
+紧跟着常量池之后的区域就是访问标记（Access flags），这个标记用于识别类或接口的访问信息。
+类索引、父类索引和接口索引
+这三部分用来确定类的继承关系，this_class 为当前类的索引，super_class 为父类的索引，interfaces 为接口。
+字段表
+一个类中定义的字段会被存储在字段表（fields）中，包括静态的和非静态的。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/03/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-03-18T22:30:44+08:00" />
+<meta property="article:modified_time" content="2024-03-18T22:30:44+08:00" /><meta property="og:site_name" content="My cool site" />
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="JVM和Java多线程"/>
+<meta name="twitter:description" content="JVM和Java多线程 [TOC]
+JVM的运行机制及基本原理 ​	当前市面上使用范围最广的，是Sun/OracleJDK或者OpenJDK中默认的 HotSpot 虚拟机。市面上还存在很多非常优秀的Java虚拟机，它们都遵循Java虚拟机规范，但具体的实现上各有特点，在某一个领域拥有突出的性能优势是它们最重要的卖点。例如IBM的J9，Azul Systems 的 Azul VM 等等。
+JVM的生命周期 ​	JVM在Java程序开始运行的时候，它才运行，程序结束的时它就停止。
+一个Java程序会开启一个JVM进程，如果一台机器上运行3个Java程序，那么就会有3个运行中的JVM进程。
+JVM中的线程分为两种：守护线程和普通线程
+守护线程是JVM自己使用的线程，比如垃圾回收（GC）就是一个守护线程。
+普通线程一般是Java程序的线程，只要JVM中有普通线程在执行，那么JVM就不会停止。
+在如下几种情况下，Java虚拟机将结束生命周期：
+1、执行了System.exit()方法
+2、程序正常执行结束
+3、程序在执行过程中遇到了异常或错误而终止进程
+4、由于操作系统出现错误而导致Java虚拟机进程终止
+JVM的结构体系 Class文件 ​	Class文件由Java编译器生成，我们创建的.Java文件在经过编译器后，会变成.Class的文件，这样才能被JVM所识别并运行。
+​	Class文件的核心设计思想是 平台无关性，它存储的不是操作系统可以直接识别的二进制本地机器码，而是根据Java虚拟机规范所自定义的指令集、符号表和一些其他信息，所以只要任何一个操作系统下开发有对应的Java虚拟机，开发者的Java程序就能跑起来。
+查看Class文件（二进制）
+xxd Hello.class Class文件组成 详见：https://javabetter.cn/jvm/class-file-jiegou.html
+魔数（cafebabe）
+第一行中有一串特殊的字符 cafebabe，它就是一个魔数，是 JVM 识别 class 文件的标志，JVM 会在验证阶段检查 class 文件是否以该魔数开头，如果不是则会抛出 ClassFormatError。
+版本号
+紧跟着魔数后面的四个字节 0000 0037 分别表示副版本号和主版本号。也就是说，主版本号为 55（0x37 的十进制），也就是 Java 11 对应的版本号，副版本号为 0。
+常量池
+紧跟在版本号之后的是常量池，它包含了类、接口、字段和方法的符号引用，以及字符串字面量和数值常量。这些信息在编译时被创建，并在运行时被Java虚拟机（JVM）使用。
+访问标记
+紧跟着常量池之后的区域就是访问标记（Access flags），这个标记用于识别类或接口的访问信息。
+类索引、父类索引和接口索引
+这三部分用来确定类的继承关系，this_class 为当前类的索引，super_class 为父类的索引，interfaces 为接口。
+字段表
+一个类中定义的字段会被存储在字段表（fields）中，包括静态的和非静态的。"/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="http://localhost:1313/posts/03/" /><link rel="prev" href="http://localhost:1313/posts/02/" /><link rel="next" href="http://localhost:1313/posts/04/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "JVM和Java多线程",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/localhost:1313\/posts\/03\/"
+        },"genre": "posts","wordcount":  1755 ,
+        "url": "http:\/\/localhost:1313\/posts\/03\/","datePublished": "2024-03-18T22:30:44+08:00","dateModified": "2024-03-18T22:30:44+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "天水的魚"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-1" class="typeit"></span></a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="魚的个人博客"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="01.png"
+        data-srcset="01.png, 01.png 1.5x, 01.png 2x"
+        data-sizes="auto"
+        alt="01.png"
+        title="01.png" /><span id="id-2" class="typeit"></span></a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">JVM和Java多线程</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-03-18">2024-03-18</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1755 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;9 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="true">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#jvm的运行机制及基本原理">JVM的运行机制及基本原理</a>
+      <ul>
+        <li><a href="#jvm的生命周期">JVM的生命周期</a></li>
+        <li><a href="#jvm的结构体系">JVM的结构体系</a></li>
+        <li><a href="#常量池">常量池</a></li>
+        <li><a href="#jvm中对象的生命周期">JVM中对象的生命周期</a></li>
+        <li><a href="#jvm分代垃圾回收策略">JVM分代垃圾回收策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#创建多线程的一些写法">创建多线程的一些写法</a>
+      <ul>
+        <li><a href="#runnable接口">Runnable接口</a></li>
+        <li><a href="#callable接口">Callable接口</a></li>
+        <li><a href="#futuretask类">FutureTask类</a></li>
+        <li><a href="#使用executorservice线程池">使用ExecutorService线程池</a></li>
+        <li><a href="#linkedblockingqueue">LinkedBlockingQueue</a></li>
+        <li><a href="#threadfactory">ThreadFactory</a></li>
+      </ul>
+    </li>
+    <li><a href="#completablefuture类">CompletableFuture类</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="jvm和java多线程">JVM和Java多线程</h1>
+<p>[TOC]</p>
+<h2 id="jvm的运行机制及基本原理">JVM的运行机制及基本原理</h2>
+<p>​	当前市面上使用范围最广的，是Sun/OracleJDK或者OpenJDK中默认的 HotSpot 虚拟机。市面上还存在很多非常优秀的Java虚拟机，它们都遵循Java虚拟机规范，但具体的实现上各有特点，在某一个领域拥有突出的性能优势是它们最重要的卖点。例如IBM的J9，Azul Systems 的 Azul VM 等等。</p>
+<hr>
+<h3 id="jvm的生命周期">JVM的生命周期</h3>
+<p>​	JVM在Java程序开始运行的时候，它才运行，程序结束的时它就停止。</p>
+<p>一个Java程序会开启一个JVM进程，如果一台机器上运行3个Java程序，那么就会有3个运行中的JVM进程。</p>
+<p>JVM中的线程分为两种：守护线程和普通线程</p>
+<p><strong>守护线程</strong>是JVM自己使用的线程，比如垃圾回收（GC）就是一个守护线程。</p>
+<p><strong>普通线程</strong>一般是Java程序的线程，只要JVM中有普通线程在执行，那么JVM就不会停止。</p>
+<p>在如下几种情况下，Java虚拟机将结束生命周期：</p>
+<p>1、执行了System.exit()方法</p>
+<p>2、程序正常执行结束</p>
+<p>3、程序在执行过程中遇到了异常或错误而终止进程</p>
+<p>4、由于操作系统出现错误而导致Java虚拟机进程终止</p>
+<hr>
+<h3 id="jvm的结构体系">JVM的结构体系</h3>
+<h4 id="class文件">Class文件</h4>
+<p>​	Class文件由Java编译器生成，我们创建的.Java文件在经过编译器后，会变成.Class的文件，这样才能被JVM所识别并运行。</p>
+<p>​	Class文件的核心设计思想是 <strong>平台无关性</strong>，它存储的不是操作系统可以直接识别的二进制本地机器码，而是根据Java虚拟机规范所自定义的指令集、符号表和一些其他信息，所以只要任何一个操作系统下开发有对应的Java虚拟机，开发者的Java程序就能跑起来。</p>
+<p><strong>查看Class文件（二进制）</strong></p>
+<pre tabindex="0"><code>xxd Hello.class
+</code></pre><h5 id="class文件组成">Class文件组成</h5>
+<p>详见：https://javabetter.cn/jvm/class-file-jiegou.html</p>
+<p><strong>魔数（cafebabe）</strong></p>
+<p>第一行中有一串特殊的字符 <code>cafebabe</code>，它就是一个魔数，是 JVM 识别 class 文件的标志，JVM 会在验证阶段检查 class 文件是否以该魔数开头，如果不是则会抛出 <code>ClassFormatError</code>。</p>
+<p><strong>版本号</strong></p>
+<p>紧跟着魔数后面的四个字节 <code>0000 0037</code> 分别表示副版本号和主版本号。也就是说，主版本号为 55（0x37 的十进制），也就是 Java 11 对应的版本号，副版本号为 0。</p>
+<p><strong>常量池</strong></p>
+<p>紧跟在版本号之后的是常量池，它包含了类、接口、字段和方法的符号引用，以及字符串字面量和数值常量。这些信息在编译时被创建，并在运行时被Java虚拟机（JVM）使用。</p>
+<p><strong>访问标记</strong></p>
+<p>紧跟着常量池之后的区域就是访问标记（Access flags），这个标记用于识别类或接口的访问信息。</p>
+<p><strong>类索引、父类索引和接口索引</strong></p>
+<p>这三部分用来确定类的继承关系，this_class 为当前类的索引，super_class 为父类的索引，interfaces 为接口。</p>
+<p><strong>字段表</strong></p>
+<p>一个类中定义的字段会被存储在字段表（fields）中，包括静态的和非静态的。</p>
+<p><strong>方法表</strong></p>
+<p>方法表和字段表类似，区别是用来存储方法的信息，包括方法名，方法的参数，方法的签名。</p>
+<p><strong>属性表</strong></p>
+<p>属性表是 class 文件中的最后一部分，通常出现在字段和方法中。</p>
+<p><strong>如何通过索引值定位到在Class文件中的位置？</strong></p>
+<blockquote>
+<p>在Java类文件中，常量池是一个索引表，它从索引值1开始计数，每个条目都有一个唯一的索引。</p>
+<ul>
+<li>常量池计数器：在常量池之前，类文件有一个16位的常量池计数器，表示常量池中有多少项。它的值比实际常量数大1（因为索引从1开始）。</li>
+<li>常量池条目：每个常量池条目的开始是一个标签（1个字节），表明了常量的类型（如Class、Fieldref、Methodref等）。根据这个类型，后面跟着的数据结构也不同。</li>
+</ul>
+<p>定位过程大致如下：</p>
+<ul>
+<li>读取常量池计数器：首先，从类文件的开头读取常量池计数器的值，确定常量池中有多少条目。</li>
+<li>遍历常量池：从常量池的第一项开始遍历。由于不同类型的常量长度不同，需要根据每个常量的类型来确定它的长度。</li>
+<li>根据索引定位：继续遍历，直到到达所需的索引值。每次遍历时，根据条目类型读取相应长度的数据，直到达到目标索引。</li>
+</ul>
+</blockquote>
+<h4 id="类加载子系统">类加载子系统</h4>
+<p>也可以称之为类加载器，JVM默认提供三个类加载器：</p>
+<p>1、**Bootstrap ClassLoader：**称之为启动类加载器，是最顶层的类加载器，负责加载JDK中的核心类库，如 rt.jar、resources.jar、charsets.jar等。</p>
+<p>2、**Extension ClassLoader：**称之为扩展类加载器，负责加载Java的扩展类库，默认加载$JAVA_HOME中jre/lib/*.jar 或 -Djava.ext.dirs指定目录下的jar包。</p>
+<p>3、**Application ClassLoader：**称之为系统类加载器，负责加载应用程序classpath目录下所有jar和class文件。</p>
+<p>除了Java默认提供的三个加载器之外，我们还可以根据自身需求自定义ClassLoader，自定义的类加载器必须继承自 java.lang.ClassLoader 类。</p>
+<blockquote>
+<p>除了 BootStrap ClassLoader 之外的两个默认加载器都是继承自 java.lang.ClassLoader ，BootStrap ClassLoader 不是一个普通的Java类，它底层由C++编写，已嵌入到了JVM的内核当中。</p>
+<p>当JVM启动后，BootStrap ClassLoader 也随之启动，负责加载完核心类库，并构造Extension ClassLoader 和App ClassLoader 类加载器。</p>
+</blockquote>
+<h5 id="双亲委派模型">双亲委派模型</h5>
+<p>​	<strong>任何一个类加载器在接到一个类的加载请求时，都会先让其父类进行加载，只有父类无法加载（或者没有父类）的情况下，才尝试自己加载。</strong></p>
+<p>父子关系：Boot &gt; Extension &gt; App &gt; 用户自定义</p>
+<p><strong>好处：</strong></p>
+<p>​	先了解一个知识点：不同的类加载器，加载同一个类，结果是虚拟机里会存在两份这个类的信息，所以当判断这两个类是否“相等”时，必定是不相等的。</p>
+<p>​	使用双亲委派模型可以保证每一个类只会有一个类加载器。例如Java最基础的Object类，它存放在 rt.jar 之中，这是 Bootstrap 的职责范围，当向上委派到 Bootstrap 时就会被加载。</p>
+<p>​	但如果没有使用双亲委派模式，可以任由自定义加载器进行加载的话，Java这些核心类的API就会被随意篡改。</p>
+<h5 id="java类的加载机制">Java类的加载机制</h5>
+<p>​	在Java的世界里，每一个类或者接口，在经历编译器后，都会生成一个个.class文件。</p>
+<p>​	类加载机制指的是将这些.class文件中的二进制数据读入到内存中，并对数据进行校验，解析和初始化。最终，每一个类都会在方法区保存一份它的元数据，在堆中创建一个与之对应的Class对象。</p>
+<p>​	类的生命周期，经历7个阶段，分别是加载、验证、准备、解析、初始化、使用、卸载。</p>
+<p>除了<strong>使用</strong>和<strong>卸载</strong>两个过程，前面的<strong>5</strong>个阶段 <strong>加载、验证、准备、解析、初始化</strong> 的执行过程**，**就是类的加载过程。</p>
+<ul>
+<li><strong>类加载的时机</strong></li>
+</ul>
+<p>对于什么时候加载，Java虚拟机规范中并没有约束，各个虚拟机都可以按自身需要来自由实现。</p>
+<p>​	但是Java虚拟机规范有明确规定，当符合以下条件时（包括但不限于），虚拟机内存中没有找到对应类型信息，则必须对类进行“初始化”操作：</p>
+<blockquote>
+<p>使用new实例化对象时、</p>
+<p>读取或者设置一个类的静态字段或方法时、</p>
+<p>反射调用时，例如 Class.forName(&ldquo;com.xxx.MyTest&rdquo;)、</p>
+<p>初始化一个类的子类，会首先初始化子类的父类、</p>
+<p>Java虚拟机启动时标明的启动类、</p>
+<p>JDK8 之后，接口中存在default方法，这个接口的实现类初始化时，接口会其之前进行初始化</p>
+</blockquote>
+<p>初始化阶段开始之前，自然还是要先经历 加载、验证、准备 、解析的。</p>
+<ul>
+<li><strong>类的加载过程</strong></li>
+</ul>
+<p>​	5个阶段并不是严格意义上的按顺序完成，在类加载的过程中，这些阶段会互相混合，交叉运行，最终完成类的加载和初始化。</p>
+<blockquote>
+<p>加载：</p>
+<p>在加载阶段，虚拟机需要完成以下三件事情：</p>
+<ol>
+<li>通过一个类的全限定名去找到其对应的.class文件（类加载器执行该动作）</li>
+<li>将这个.class文件内的二进制数据读取出来，转化成方法区的运行时数据结构</li>
+<li>在Java堆中生成一个代表这个类的java.lang.Class对象，作为对方法区中这些数据的访问入口</li>
+</ol>
+<p>验证：</p>
+<p><strong>文件格式验证</strong>：验证字节流是否符合Class文件格式的规范。例如：是否以0xCAFEBABE开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型 &hellip;&hellip; 等等</p>
+<p><strong>元数据验证</strong>：对字节码描述的元数据信息进行语义分析，要符合Java语言规范。例如：是否继承了不允许被继承的类（例如final修饰过的）、类中的字段、方法是否和父类产生矛盾 &hellip;&hellip; 等等</p>
+<p><strong>字节码验证</strong>：对类的方法体进行校验分析，确保这些方法在运行时是合法的、符合逻辑的。</p>
+<p><strong>符号引用验证</strong>：发生在<strong>解析</strong>阶段，符号引用转为直接引用的时候，例如：确保符号引用的全限定名能找到对应的类、符号引用中的类、字段、方法允许被当前类所访问 &hellip;&hellip; 等等</p>
+<p>验证阶段不是必须的，虽然这个阶段非常重要。Java虚拟机允许程序员主动取消这个阶段，用来缩短类加载的时间，可以根据自身需求，使用 -Xverify:none参数来关闭大部分的类验证措施。</p>
+<p>准备：</p>
+<p>​	这个阶段，类的静态字段信息（static 修饰过的变量）会得到内存分配，并且设置为初始值。初始值指的是变量数据类型的默认值，而不是被在Java代码中被显式地赋予的值。但是，当字段信息被 final 修饰成常量（ConstantValue）时，这个初始值就是Java代码中显式地赋予的值。</p>
+<p>​	在JDK8取消永久代后，方法区变成了一个逻辑上的区域，这些类变量的内存实际上是分配在Java堆中的。</p>
+<p>解析：</p>
+<p>​	这个阶段，虚拟机会把这个Class文件中，常量池内的符号引用转换为直接引用。主要解析的是 类或接口、字段、类方法、接口方法、方法类型、方法句柄等符号引用。我们可以把解析阶段中，符号引用转换为直接引用的过程，理解为当前加载的这个类，和它所引用的类，正式进行连接的过程。</p>
+<p>​	什么是符号引用？</p>
+<p>​	Java代码在编译期间，是不知道最终引用的类型具体指向内存中哪个位置的，这时候会用一个符号引用，来表示具体引用的目标。Java虚拟机规范中明确定义了符号引用的形式，符合这个规范的前提下，符号引用可以是任意值，只要能通过这个值能定位到目标。</p>
+<p>​	什么是直接引用？</p>
+<p>​	直接引用就是可以直接或间接指向目标内存位置的指针或句柄。</p>
+<p>​	引用的类型，还未加载初始化怎么办？</p>
+<p>​	当出现这种情况，会触发这个引用对应类型的加载和初始化。</p>
+<p>初始化：</p>
+<p>​	初始化的过程，就是执行类构造器 &lt;clinit&gt;()方法的过程。&lt;clinit&gt;() 方法 和 &lt;init&gt; 方法不同，它们一个是“类构造器”，一个是实例构造器。
+​	Java虚拟机会保证在子类&lt;clinit&gt;() 方法在执行前，父类的 &lt;clinit&gt;() 已经执行完毕。而 &lt;init&gt; 方法则需要显性的调用父类的构造器。&lt;clinit&gt;() 方法由编译器自动生成，但不是必须生成的，只有这个类存在static修饰的变量，或者类中存在静态代码块但时候，才会自动生成&lt;clinit&gt;()方法。</p>
+<p>​	&lt;clinit&gt;() 方法的作用是什么？</p>
+<p>​	上面提到在准备阶段，已经对类中static修饰的变量赋予了初始值。&lt;clinit&gt;() 方法的作用，就是给这些变量赋予程序员实际定义的值。同时类中如果存在static代码块，也会执行这个静态代码块里面的代码。</p>
+</blockquote>
+<p>总结：当一个符合Java虚拟机规范的字节流文件，经历 加载、验证、准备、解析、初始化这些阶段相互协作执行完成之后，加载阶段读取到的Class字节流信息，会按虚拟机规定的格式，在方法区保存一份，然后Java 堆中，会创建一个 java.lang.Class 类的对象，这个对象描述了这个类所有信息，也提供了这个类在方法区的访问入口。</p>
+<h4 id="方法区">方法区</h4>
+<p>​	方法区用于存储JVM加载完成的类型信息、常量、静态变量、即时编译器编译后的代码缓存，方法区和 Java 堆区一样，都是线程共享的内存区域。</p>
+<p>​	在JDK8以前，使用永久代的方式来实现方法区，JDK8以后，永久代的概念被废弃了，方法区改用和 JRockit、J9一样的**在本地内存中实现的元空间（Meta Space）**来代替，好处是元空间会在运行时根据需要动态调整，只要没有超过当前进程可用的内存上限（32位和64位系统各不相同），就不会出现溢出的问题。</p>
+<p>​	方法区也可以被垃圾回收，但条件非常严苛，必须在该类没有任何引用的情况下。</p>
+<p>​	类型信息的回收需满足以下三个条件：</p>
+<blockquote>
+<p>1、所有实例被回收
+2、加载该类的ClassLoader 被回收
+3、Class 对象无法通过任何途径访问（包括反射）</p>
+</blockquote>
+<p>​	当需要扩展时空间不足，会抛出 OutOfMemoryError 异常。</p>
+<h4 id="java堆jvm堆java-heap">Java堆（JVM堆、java heap)</h4>
+<p>​	堆区负责存放对象实例，当Java创建一个类的实例对象或者数组时，都会在堆中为新的对象分配内存。</p>
+<p>​	虚拟机中只有一个堆，程序中所有的线程都共享它。通常情况下，堆占用的内存空间是最多的。堆的存取方式为管道类型，先进先出。在程序运行中，可以动态的分配堆的内存大小。堆的内存资源回收是交给GC进行管理的。</p>
+<p>​	当需要扩展时空间不足，会抛出OutOfMemoryError 异常。</p>
+<h4 id="虚拟机栈">虚拟机栈</h4>
+<p>​	在栈中只保存基本数据类型（包装类型放于堆中）和对象的引用。栈内创建的基本类型数据在超出其作用域后，会被自动释放掉，它不由GC管理。而在栈内创建的引用类型实例，则还是由GC管理。</p>
+<p>​	当一个线程创建运行的时候，与之对应的栈就创建了，每个栈中的数据都是私有的，其他线程不能访问。</p>
+<p>​	每个线程都会建立一个栈，每个栈又包含了若干个栈帧，每个栈帧对应着每个方法的每次调用，栈帧包含了三个部分：局部变量区（方法内基本类型变量、对象实例的引用）、操作数栈区（存放方法执行过程中产生的中间结果）、运行环境区（动态连接、正确的方法返回相关信息、异常捕捉）。</p>
+<p>​	虚拟机栈在深度溢出或扩展失败的时候，会分别抛出StackOverflowError 和 OutOfMemoryError 异常。</p>
+<h4 id="本地方法栈native-method-stack">本地方法栈（Native Method Stack）</h4>
+<p>​	本地方法栈的功能和JVM栈非常类似，区别在于虚拟机栈执行的是Java方法，本地方法栈执行的是本地（Native）方法服务，存储的也是本地方法的局部变量表，本地方法的操作数栈等信息。</p>
+<p>​	栈内的数据在超出其作用域后，会被自动释放掉，它不由GC管理。</p>
+<p>​	本地方法栈是在 程序调用 或 JVM调用 **本地方法接口（Native）**时候启用。</p>
+<p>​	本地方法都不是使用Java语言编写的，它们可能由C或其他语言编写，本地方法也不由JVM去运行，所以本地方法的运行不受JVM管理。</p>
+<p>​	HotSpot VM将本地方法栈和JVM栈合并了。</p>
+<h4 id="程序计数器">程序计数器</h4>
+<p>​	在JVM的概念模型里，字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令。分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。</p>
+<p>​	JVM的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，为了各条线程之间的切换后计数器能恢复到正确的执行位置，所以<strong>每条线程都会有一个独立的程序计数器</strong>。</p>
+<p>​	程序计数器仅占很小的一块内存空间。</p>
+<p>​	当线程正在执行一个Java方法，程序计数器记录的是正在执行的JVM字节码指令的地址。如果正在执行的是一个Natvie（本地方法），那么这个计数器的值则为空（Underfined）。</p>
+<h4 id="jvm执行引擎">JVM执行引擎</h4>
+<p>​	Java虚拟机相当于一台虚拟的物理机，这两种机器都有代码执行能力，区别主要是物理机的执行引擎是直接建立在处理器、硬件、指令集和操作系统层面上的，而JVM的执行引擎是自己实现的，因此程序员可以自行制定指令集和执行引擎的结构体系。</p>
+<p>​	执行引擎的主要职责，就是把这些自行制定的指令集翻译成硬件所支持的指令集格式，然后执行。</p>
+<p>​	在JVM规范中制定了虚拟机字节码执行引擎的概念模型，这个模型称之为JVM执行引擎的统一外观，各个Java 虚拟机的发行厂商都需要按照这个规范来实现。</p>
+<p>​	在不同的虚拟机实现中，可能会有两种的执行方式：解释执行（通过解释器执行）和编译执行（通过即时编译器产生本地代码）。虚拟机可以按自身的需求，采用一种或同时采用多种组合的方式来实现执行引擎。但无论内部怎么实现，都要遵循<strong>输入的是字节码文件、处理过程是等效字节码解析过程、输出的是执行结果</strong>这个JVM规范要求。</p>
+<h4 id="本地方法接口jni">本地方法接口(JNI)</h4>
+<p>JNI是Java Native interface的缩写，它提供了若干的API实现了Java和其他语言的通信（主要是C和C++）。</p>
+<p><strong>JNI的适用场景</strong></p>
+<p>​	当我们有一些旧的库，已经使用C语言编写好了，如果要移植到Java上来，非常浪费时间，而JNI可以支持Java程序与C语言编写的库进行交互，这样就不必要进行移植了。或者是与硬件、操作系统进行交互、提高程序的性能等，都可以使用JNI。</p>
+<p><strong>JNI的副作用</strong></p>
+<p>一旦使用JNI，Java程序将丢失了Java平台的两个优点：</p>
+<p>1、程序不再跨平台，要想跨平台，必须在不同的系统环境下程序编译配置本地语言部分。</p>
+<p>2、程序不再是绝对安全的，本地代码的使用不当可能会导致整个程序崩溃。一个通用规则是，调用本地方法应该集中在少数的几个类当中，这样就降低了Java和其他语言之间的耦合。</p>
+<p><strong>操作步骤：</strong></p>
+<ol>
+<li>将需要用C/C++实现的方法用native关键字声明</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">native</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>
+<p>用静态代码块进行动态链接库加载jnidemo.dll/jnidemo.so</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">static</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">System</span><span class="p">.</span><span class="na">loadLibrary</span><span class="p">(</span><span class="s">&#34;jnidemo&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div></li>
+<li>
+<p>用javac -h .  JNIDemo.java生成头文件（旧版本为javah)，执行完后生成一个的.h头文件和class文件。</p>
+</li>
+<li>
+<p>实现对应的函数：创建.cpp文件，写代码，将.h头文件里函数的声明复制过来,加上需要用的参数名。</p>
+</li>
+<li>
+<p>将C/C++编译成动态链接库,mac用jnilib文件，win用dll文件</p>
+<p><strong>查找jdk安装位置：/usr/libexec/java_home</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">g++ -o javafirst.jnilib -fPIC -shared -I/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/include/darwin java_first.cpp
+</span></span></code></pre></div><p>两个路径一个是jni.h的，一个是jni_md.h的</p>
+<p>-shared: 表示创建一个共享目标文件，即动态链接库</p>
+<p>-fPIC: 生成位置无关代码（Position Independent Code），这是在创建共享库时必须的选项。</p>
+</li>
+</ol>
+<h4 id="jvm-gc垃圾回收器">JVM GC（垃圾回收器）</h4>
+<p>​	Java 的垃圾回收器并不是特指一种，Java官方本身就提供了很多个GC回收器供用户选择，还有各个Java虚拟机厂商（例如 Azul 的PCG、C4）也自己设计开发了很多优秀的垃圾回收器。</p>
+<p>​	<strong>Stop The World</strong> 会在任何一种GC算法中发生，其实可以把它理解为JVM GC在清理内存时，整个程序的停顿时间。当 Stop The World 发生时，除GC所需的线程外，所有的线程都进入等待状态，直到 GC 任务完成。每一代的Java垃圾回收器，都把缩减 <strong>Stop The World</strong> 停顿时间作为很重要的目标。</p>
+<p>​	JVM GC只回收<strong>堆区和方法区</strong>内的基本类型数据和对象，这在上面也提到过。</p>
+<p><strong>判断对象是否可以回收</strong></p>
+<p>​	当一个对象到<code>GC Roots</code>不可达时，在下一个垃圾回收周期中尝试回收该对象，如果对象重写了<code>finalize()</code>，并在这个方法中成功自救(将自身赋予某个引用)，那么这个对象不会被回收。但如果这个对象没有重写<code>finalize()</code>方法或已执行过这个方法，该对象将会被回收。</p>
+<p>​	需要进行回收的对象就是已经没有存活的对象，判断一个对象是否存活常用的有两种办法：引用计数算法和可达性分析算法（主要）。</p>
+<blockquote>
+<ul>
+<li>
+<p>引用计数算法：
+每个对象有一个引用计数属性，新增一个引用时计数加<code>1</code>，引用释放时计数减<code>1</code>，计数为<code>0</code>时可以回收。此方法简单，但是无法解决对象相互循环引用的问题，就是互相引用的对象。</p>
+</li>
+<li>
+<p>可达性分析算法（Reachability Analysis）（根搜索算法）：
+通过一系列可被作为 <strong>GC Roots</strong> 的根对象来作为起始节点，从这些节点开始，根据引用关系向下搜索，搜索过程的就是一条<strong>引用链（Reference Chain）</strong>，没有在这个链条上面的对象，也就是根节点通过引用链不可达到这个对象时，就认为这个对象是可以被回收的。</p>
+</li>
+</ul>
+</blockquote>
+<p>​</p>
+<p>​	在Java语言中，可以作为根节点的对象(<code>GC Roots</code>)包括：</p>
+<blockquote>
+<p>+ 虚拟机栈中引用的对象，例如线程调用方法时，使用或产生的参数、局部变量、临时变量等；</p>
+<p>+ 方法区中类的引用类型静态变量或常量；</p>
+<p>+ 本地方法栈中<code>JNI</code>引用的对象。</p>
+<p>+ 在JVM内部的对象，例如基本数据类型的Class对象，一些常驻的异常对象（NullPointExcepiton），系统类加载器等。</p>
+<p>+ 所有synchronized同步锁的持有对象。</p>
+<p>+ 反映JVM内部情况的JMXBean、JVMTI注册的回调、本地代码缓存等。</p>
+</blockquote>
+<p>​	如何找到GC Roots：</p>
+<p>​	虽然我们明确知道哪些对象可以作为 GC Roots ，但是遍历整个方法区，栈，常量池等，显然效率太低。</p>
+<p>​	HotSpot使用OopMap来实现，他将所有可能的GC Roots记录下来，这样直接从OopMap里就可以拿到GC Roots</p>
+<p>但是，会导致OopMap变化的操作太多了，因此，只会在安全点记录OopMap</p>
+<p>​	在找到GC Roots的这个过程，是一定会导致STW(stop the world暂停所有用户线程)的。暂停所有线程是需要一个合适的时机的，执行代码不是说停就能停的，至于原因涉及到了RSet的维护等等，比较复杂。总之专门有<strong>安全点和安全区域</strong>两个概念作为线程由于某种原因需要暂停的暂停点。当用户线程执行到安全点或安全区域的代码处才可以被暂停。</p>
+<p>​	触发GC的时机：当程序创建一个新的对象或者基本类型的数据，内存空间不足时，会触发GC的执行。</p>
+<p>不同的垃圾回收器，会有不同的回收策略，但大致可以分为两类：分代回收和局部回收两种策略</p>
+<p><strong>分代回收机制：</strong></p>
+<p>各区域触发垃圾回收的类型与解释：</p>
+<blockquote>
+<p>Minor GC：只回收新生代区域，通常频率较高但耗时较短。</p>
+<p>Major GC：只回收老年代区域。只有CMS实现了Major GC，所以在老年代里，触发GC，除了CMS和G1之外的其他收集器，大多数触发的其实是 Full GC。</p>
+<p>Full GC：回收整个堆区和方法区，开销较大，尽量避免过于频繁的发生。</p>
+<p>Mixed GC：回收整个新生代和部分老年代。G1收集器实现了这个类型。</p>
+</blockquote>
+<p><strong>常用的垃圾回收器</strong></p>
+<p>​	JDK8 之前属于古早版本</p>
+<p>​	JDK8 默认垃圾收集器是 Parallel Scavenge + Parallel Old</p>
+<p>​	JDK9 ~ 17 默认垃圾收集器仍然是G1</p>
+<p>​	<strong>Serial（-XX:+UseSerialGC）</strong></p>
+<p>​	Serial 是Java虚拟机初代收集器，在JDK1.3之前是Java虚拟机<strong>新生代收集器</strong>的唯一选择，这是一个单线程工作的收集器。在进行垃圾回收的时候，需要暂停所有的用户线程，直到回收结束。</p>
+<p>​	虽然历史久远，但它依然是HotSpot虚拟机运行在客户端模式下，或者4核4GB以下服务端的默认新生代收集器，这种核心数和内存空间较小的场景下，它单线程的优势就体现出来了，没有线程交互的开销，加上内存空间不大，单次回收耗时几十毫秒，这点停顿时间，完全是可以接受的。</p>
+<p>​	Serial 负责收集新生代区域，它采用标记-复制算法。</p>
+<p>​	SerialOld 负责收集老年代区域，它采用标记-整理算法。</p>
+<p>​	<strong>ParNew（-XX:+UseParNewGC）</strong></p>
+<p>​	ParNew 就是 在Serial 收集器的基础之上，实现了它的多线程版本。它可以多条线程同时进行垃圾收集，这也是它和 Serial 收集器的最大的区别，其他的功能性、配置、策略等等的和 Serial 基本一致。</p>
+<p>​	在JDK9之后，Java官方取消了ParNew和除了CMS收集器之外的所有老年代收集器的搭配，而且还取消了 - XX:+UseParNewGC 这个参数。所以JDK9之后，ParNew只能和CMS搭配使用了。</p>
+<p>​	ParNew 负责收集新生代区域，它采用标记-复制算法。</p>
+<p>​	ParNew 是JDK7之前 Server VM 模式下的首选的新生代收集器。但是在单CPU的情况下，它的效率不会比 Serial收集器高的。</p>
+<p>​	<strong>CMS （-XX:+UseConcMarkSweepGC）</strong></p>
+<p>​	CMS（Concurrent Mark Sweep） 是JDK1.4后期推出的GC收集器，它是一款并发低停顿的收集器，<strong>对于响应速度有较高要求，对停顿时间忍受度低的应用，非常适合使用CMS作为垃圾收集器。</strong></p>
+<p>​	第一个关注 GC 停顿时间（STW 的时间）的垃圾收集器。</p>
+<p>​	CMS 负责收集老年代区域，它采用标记-清除算法。</p>
+<p>​	它的运行过程相对复杂一些，可以分为四个步骤：</p>
+<blockquote>
+<p>1、初始标记（CMS initial mark）</p>
+<p>这个阶段<strong>需要</strong> Stop The World（暂停暂停所有用户线程），但这个阶段的速度很快，因为只标记和根节点（GC Roots）直接关联的对象。</p>
+<p>2、并发标记（CMS Concurrent mark）</p>
+<p>这个阶段<strong>不需要</strong> Stop The World，在初始标记完成后，并发标记从GC Roots直接关联的对象开始，遍历整个引用链，这个阶段耗时较长，但<strong>用户线程可以和GC线程一起并发执行</strong>。</p>
+<p>3、重新标记（CMS remark）</p>
+<p>这个阶段<strong>需要</strong> Stop The World，因为并发标记阶段，用户线程和标间线程同时在运行，相当于一边扫地一边丢垃圾，重新标记就是修正用户线程继续运行，导致的变动的那一部分对象。这一阶段的耗时比初始标记长一些，但远没有达到并发标记阶段那么长的时间。这个阶段可以多线程并行标记。</p>
+<p>4、并发清理（Concurrent sweep）</p>
+<p>这个阶段<strong>不需要</strong> Stop The World，执行到这里，说明标记阶段已经完成，此时遍历整个老年代的内存空间，清理掉可回收的对象，由于不需要移动整理存活的对象，这个阶段可以允许用户线程和回收线程并发执行。在清理完成后，会重置CMS收集器的数据结构，等待下一次垃圾回收。</p>
+</blockquote>
+<p>​	以上4个步骤可以看出，CMS之所以能实现低延迟，是因为它把垃圾搜集分成了几个明确的步骤，在一些耗时较长的阶段实现了用户线程和GC线程并发执行的能力。<strong>用两次短暂的 Stop Tow World 来代替了其他收集器一整段长时间的 Stop Tow World</strong>。</p>
+<p>​	CMS确实是非常优秀的垃圾收集器，但它也是有缺点的：</p>
+<blockquote>
+<p>**1、内存碎片。**由于使用了 标记-清理 算法，回收结束后会产生大量不连续的内存空间，也就是内存碎片。</p>
+<p>**2、GC进行时会降低吞吐量。**由于使用了并发处理，很多情况下都是GC线程和应用线程并发执行的，GC线程肯定会占用一部分计算资源。默认情况下，CMS 启用的垃圾回收线程数是<code>（CPU数量 + 3)/4</code>，当 CPU 数量很大时，启用的垃圾回收线程数占比就越小。但如果 CPU 数量很小，例如只有 2 个 CPU，垃圾回收线程占用就达到了 50%，这极大地降低系统的吞吐量，无法接受。这个期间会降低一部分吞吐量。</p>
+<p>**3、浮动垃圾。**CMS有两个阶段是可以用户线程和GC线程并发执行的，用户线程的继续执行自然会伴随垃圾的不断产生，这些就是浮动垃圾。这些垃圾只能等下次触发GC的时候才能清除了，也因为这些浮动垃圾的存在，CMS收集器需要留一手，JDK5的时候，在老年代内存空间使用了68%的时候就会触发一次GC，到了JDK6，觉得JDK5的这个设置太保守了，所以调整到了92%。</p>
+<p>(可以通过-XX:CMSInitiatingOccupancyFraction 调整这个阈值)</p>
+</blockquote>
+<p>​	<strong>Parallel Scavenge（-XX:+UseParallelGC）</strong></p>
+<p>​	和 ParNew 很相似，都是新生代的收集器，支持多线程并行回收，也同样是使用标记-复制来作为回收算法。</p>
+<p>​	但 Parallel Scavenge 的关注点不一样，它的目标是实现一个可控制吞吐量的垃圾收集器。</p>
+<p>​	吞吐量的计算公式：运行用户代码时间 / (运行用户代码时间 + 运行垃圾收集时间)</p>
+<p>​	<strong>Parallel Old（-XX:+UseParallelOldGC）</strong></p>
+<p>​	就像 Serial Old 是 Serial 的老年代版本一样，Parallel Old 是 Parallel Scavenge 的老年代版本。</p>
+<p>​	Parallel Old 也支持多线程并行回收的能力，使用标记-整理来作为回收算法。这个收集器是JDK6的时候推出的，和 Parallel Scavenge 搭配，在多CPU核心和大内存的场景下，吞吐性能优秀。</p>
+<p>​	在注重吞吐量和多CPU核心的情况下，都可以优先考虑 Parallel Scavenge + Parallelo Old 收集器，<strong>这也是JDK8默认的垃圾收集器组合</strong>。</p>
+<p>​	<strong>Garbage First（G1）</strong></p>
+<p>​	在JDK9 的时候成为了服务端模式下的默认垃圾收集器。</p>
+<p>​	G1 收集器的设计理念是：实现一个<strong>停顿时间可控的低延迟垃圾收集器</strong></p>
+<p>​	G1 基于分代的思想进行设计，对堆（Java Heap）内存进行了重新布局，把堆区划分成很多个大小相同的区域（Region），新、老年代也不再固定在某个区域了，每一个Region都可以根据运行情况的需要，扮演Eden、Survivor、老年代区域、或者Humongous区域。</p>
+<p>​	可以通过 <code>-XX:G1HeapRegionSize=n</code> 来设置 Region 的大小，可以设定为 1M、2M、4M、8M、16M、32M（不能超过）。</p>
+<p>​	大对象（超过了一个 Region 大小的 50%）会被存储到Humongous区域，G1大多数情况下会把这个区域当作老年代来看待。如果对象占用空间超过Region的容量，就会存放到N个连续的 Humongous Region 中。</p>
+<p>​	G1 可以以增量方式执行垃圾回收，这意味着它不需要一次性回收整个堆空间，而是可以逐步、增量地清理。有助于控制停顿时间，尤其是在处理大型堆时。</p>
+<p>​	G1 垃圾回收器可以并行回收垃圾，这意味着它可以利用多个 CPU 来加速垃圾回收的速度，这一特性在年轻代的垃圾回收（Minor GC）中特别明显，因为年轻代的回收通常涉及较多的对象和较高的回收速率。</p>
+<p>​	在进行老年代的垃圾回收时，G1 使用标记-整理算法。</p>
+<p>​	收集器的运行过程可以大致分成四个步骤：</p>
+<blockquote>
+<p><strong>初始标记（Initial Marking）-</strong> <strong>Stop The World</strong></p>
+<p>只标记 GC Roots 能直接关联的对象，还有一些额外的细节操作例如修改TAMS指针的值，保证后续阶段用户程序并发运行的时候，新对象分配在正确的位置。这个阶段需要暂停用户线程，但耗时很短。</p>
+<p><strong>并发标记（Concurrent Marking）- No Stop The World</strong></p>
+<p>从根节点（GC Root）开始，顺着引用链遍历整个堆，找出存活的对象。这个步骤耗时较长，但用户线程可以和GC线程并发执行。</p>
+<p><strong>最终标记（Final Marking）- Stop The World</strong></p>
+<p>处理并发标记阶段，用户线程继续运行产生的引用变动，这个阶段需要暂停用户线程，支持并行处理。</p>
+<p><strong>筛选回收（Live Data Counting and Evacuation）- Stop The World</strong></p>
+<p>根据以上三个阶段标记完成的数据，计算出各个Region的回收价值和成本，再根据用户期望的停顿时间来决定要回收多少个Region。回收使用的是复制算法，把需要回收的这些Region里存活的对象，复制到空闲的Region中，然后清理掉旧Region全部空间。因为需要移动存活的对象，所以不可避免的要暂停用户线程，这个步骤支持多条线程并行回收。</p>
+</blockquote>
+<p>​	G1 中存在三种 GC 模式，分别是 Young GC、Mixed GC 和 Full GC。</p>
+<blockquote>
+<p>当 Eden 区的内存空间无法支持新对象的内存分配时，G1 会触发 Young GC。</p>
+<p>当需要分配对象到 Humongous 区域或者堆内存的空间占比超过 <code>-XX:G1HeapWastePercent</code> 设置的 InitiatingHeapOccupancyPercent 值时，G1 会触发一次 concurrent marking，它的作用就是计算老年代中有多少空间需要被回收，当发现垃圾的占比达到 <code>-XX:G1HeapWastePercent</code> 中所设置的 G1HeapWastePercent 比例时，在下次 Young GC 后会触发一次 Mixed GC。</p>
+<p>Mixed GC 是指回收年轻代的 Region 以及一部分老年代中的 Region。Mixed GC 和 Young GC 一样，采用的也是复制算法。</p>
+<p>在 Mixed GC 过程中，如果发现老年代空间还是不足，此时如果 G1HeapWastePercent 设定过低，可能引发 Full GC。<code>-XX:G1HeapWastePercent</code> 默认是 5，意味着只有 5% 的堆是“浪费”的。如果浪费的堆的百分比大于 G1HeapWastePercent，则运行 Full GC。</p>
+<p>在以 Region 为最小管理单元以及所采用的 GC 模式的基础上，G1 建立了停顿预测模型，即 Pause Prediction Model 。这也是 G1 非常被人所称道的特性。</p>
+<p>我们可以借助 <code>-XX:MaxGCPauseMillis</code> 来设置期望的停顿时间（默认 200ms），G1 会根据这个值来计算出一个合理的 Young GC 的回收时间，然后根据这个时间来制定 Young GC 的回收计划。</p>
+</blockquote>
+<p>​	<strong>G1收集器是怎么保证停顿时间可控的？</strong></p>
+<blockquote>
+<p>首先G1把内存区域分成了若干个相同大小的 Region 区，在执行回收的时候，根据标记阶段统计到的数据，计算出各个 Region 区的回收价值和成本，有了这些数据之后，就可以计算出回收哪几个Region价值最高，且符合用户预期的停顿时间。</p>
+</blockquote>
+<p>​	<strong>ZGC</strong></p>
+<p>​	JDK11 推出的一款低延迟垃圾收集器，适用于大内存低延迟服务的内存管理和回收，SPEC jbb 2015 基准测试，在 128G 的大堆下，最大停顿时间才 1.68 ms，停顿时间远胜于 G1 和 CMS。</p>
+<p>​	ZGC 很强大，它的目标是：</p>
+<blockquote>
+<ul>
+<li>停顿时间不超过 10ms；</li>
+<li>停顿时间不会随着堆的大小，或者活跃对象的大小而增加；</li>
+<li>支持 8MB~4TB 级别的堆，未来支持 16TB。</li>
+</ul>
+</blockquote>
+<p>​	前面讲 G1 垃圾收集器的时候提到过，Young GC 和 Mixed GC 均采用的是复制算法，复制算法主要包括以下 3 个阶段：</p>
+<p>①、标记阶段，从 GC Roots 开始，分析对象可达性，标记出活跃对象。</p>
+<p>②、对象转移阶段，把活跃对象复制到新的内存地址上。</p>
+<p>③、重定位阶段，因为转移导致对象地址发生了变化，在重定位阶段，所有指向对象旧地址的引用都要调整到对象新的地址上。</p>
+<p>​	标记阶段因为只标记 GC Roots，耗时较短。但转移阶段和重定位阶段需要处理所有存活的对象，耗时较长，并且转移阶段是 STW 的，因此，G1 的性能瓶颈就主要卡在转移阶段。</p>
+<p>​	与 G1 和 CMS 类似，<strong>ZGC 也采用了复制算法，只不过做了重大优化，ZGC 在标记、转移和重定位阶段几乎都是并发的，这是 ZGC 实现停顿时间小于 10ms 的关键所在。</strong></p>
+<p>​		<strong>ZGC 是怎么做到的呢？</strong></p>
+<ul>
+<li>指针染色（Colored Pointer）：一种用于标记对象状态的技术。</li>
+<li>读屏障（Load Barrier）：一种在程序运行时插入到对象访问操作中的特殊检查，用于确保对象访问的正确性。</li>
+</ul>
+<p>​	这两种技术可以让所有线程在并发的条件下就指针的颜色 (状态) 达成一致，而不是对象地址。因此，ZGC 可以并发的复制对象，这大大的降低了 GC 的停顿时间。</p>
+<blockquote>
+<p>指针染色（空间换时间）：</p>
+<p>在一个指针中，除了存储对象的实际地址外，还有额外的位被用来存储关于该对象的元数据信息。这些信息可能包括：</p>
+<ul>
+<li>对象是否被移动了（即它是否在回收过程中被移动到了新的位置）。</li>
+<li>对象的存活状态。</li>
+<li>对象是否被锁定或有其他特殊状态。</li>
+</ul>
+<p>通过在指针中嵌入这些信息，ZGC 在标记和转移阶段会更快，因为通过指针上的颜色就能区分出对象状态，不用额外做内存访问。</p>
+<p>ZGC仅支持64位系统，它把64位虚拟地址空间划分为多个子空间。</p>
+<p>读屏障：</p>
+<p>当程序尝试读取一个对象时，读屏障会触发以下操作：</p>
+<ul>
+<li>检查指针染色：读屏障首先检查指向对象的指针的颜色信息。</li>
+<li>处理移动的对象：如果指针表示对象已经被移动（例如，在垃圾回收过程中），读屏障将确保返回对象的新位置。</li>
+<li>确保一致性：通过这种方式，ZGC 能够在并发移动对象时保持内存访问的一致性，从而减少对应用程序停顿的需要。</li>
+</ul>
+<p>读屏障可能被GC线程和业务线程触发，并且只会在访问堆内对象时触发，访问的对象位于GC Roots时不会触发，这也是扫描GC Roots时需要STW的原因。</p>
+</blockquote>
+<p>​	简化的示例代码，展示了读屏障的触发时机：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="na">FieldA</span><span class="w">   </span><span class="c1">// 从堆中读取引用，需要加入屏障</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="o">&lt;</span><span class="n">Load</span><span class="w"> </span><span class="n">barrier</span><span class="o">&gt;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Object</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="w">  </span><span class="c1">// 无需加入屏障，因为不是从堆中读取引用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">o</span><span class="p">.</span><span class="na">dosomething</span><span class="p">()</span><span class="w"> </span><span class="c1">// 无需加入屏障，因为不是从堆中读取引用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">obj</span><span class="p">.</span><span class="na">FieldB</span><span class="w">  </span><span class="c1">//无需加入屏障，因为不是对象引用</span><span class="w">
+</span></span></span></code></pre></div><p>​	具体过程参考：https://javabetter.cn/jvm/gc-collector.html</p>
+<p>就目前来说，JVM 的垃圾收集器主要分为两大类：<strong>分代收集器</strong>和<strong>分区收集器</strong>，分代收集器的代表是 CMS，分区收集器的代表是 G1 和 ZGC。</p>
+<p><strong>查看我的GC器</strong>（我的是jdk21)：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">List</span><span class="o">&lt;</span><span class="n">GarbageCollectorMXBean</span><span class="o">&gt;</span><span class="w"> </span><span class="n">beans</span><span class="w"> </span><span class="o">=</span><span class="w">                                               </span><span class="n">ManagementFactory</span><span class="p">.</span><span class="na">getGarbageCollectorMXBeans</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">GarbageCollectorMXBean</span><span class="w"> </span><span class="n">bean</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">beans</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">bean</span><span class="p">.</span><span class="na">getName</span><span class="p">());}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>我的结果：</p>
+<blockquote>
+<p>G1 Young Generation
+G1 Concurrent GC
+G1 Old Generation</p>
+</blockquote>
+<hr>
+<h3 id="常量池">常量池</h3>
+<h4 id="class-常量池">Class 常量池</h4>
+<p>​	Java代码在经过编译器后，会生成一个Class文件，这个常量池就是Class文件里的一大段内容（通常是最大的一段内容），它主要存放着 字面量、符号引用 等信息，在JVM把Class文件加载完成后，Class 常量池里的数据会存放到<strong>运行时常量池</strong>中。</p>
+<h4 id="运行时常量池runtime-constant-pool">运行时常量池（Runtime Constant Pool）</h4>
+<p>​	运行时常量池是方法区（Method Area）的一部分，运行时常量池中存储的，是基本类型的数据和对象的引用。</p>
+<p>​	Java虚拟机在加载Class文件时，Class文件内容里常量池的数据会放入运行时常量池。每一个加载好的Class对象里都会有一个运行时常量池。</p>
+<h4 id="字符串常量池string-constant-pool--其他包装类型里实现的常量池">字符串常量池（String Constant Pool） &amp; 其他包装类型里实现的常量池</h4>
+<p>​	字符串由一个char[]构成，当我们的Java程序里频繁出现相同字面量的代码时，重复的创建和销毁对象是一件很浪费资源的事情，所以Java实现了一个字符串常量池。</p>
+<p>​	JDK7之后，字符串常量池从方法区迁移到了堆区，它的底层实现可以理解为是一个<strong>HashTable</strong>。Java虚拟机中只会存在一份字符串常量池。字符串常量池里，存放的数据可以是引用也可以是对象实例本身。</p>
+<p>​	字符串常量池也具备运行时常量池动态性的特征，它支持运行期间将新的常量放入池中，这种特性被开发人员利用比较多的就是 String.intern() 方法。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">String</span><span class="w"> </span><span class="n">str1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;aaa&#34;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>当以上代码运行时，JVM会到字符串常量池查找 &ldquo;aaa&rdquo; 这个字面量对象是否存在：</p>
+<p><strong>存在</strong>：则返回该对象的引用给变量 <strong>str1</strong> 。</p>
+<p><strong>不存在</strong>：则创建一个对象，同时将引用返回给变量 <strong>str1 。</strong>（JDK8之后，对象实例直接存储在字符串常量池里）</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">String</span><span class="w"> </span><span class="n">str1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;aaa&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">str2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;aaa&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">str1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">str2</span><span class="p">);</span><span class="c1">//返回TRUE</span><span class="w">
+</span></span></span></code></pre></div><p>因为变量<strong>str1</strong> 和<strong>str2</strong> 都指向同一个对象，所以返回true。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">String</span><span class="w"> </span><span class="n">str3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">&#34;aaa&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">str1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">str3</span><span class="p">);</span><span class="c1">//返回FALSE</span><span class="w">
+</span></span></span></code></pre></div><p>当我们使用了<strong>new</strong>来构造字符串对象的时候，不管字符串常量池中是否有相同内容的对象的引用，新的字符串对象都会创建。因为两个指向的是不同的对象，所以返回FALSE 。</p>
+<p><strong>String.intern()方法</strong></p>
+<p>对于使用了new 创建的字符串对象，如果想要将这个对象添加到字符串常量池，可以使用intern() 方法。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">String</span><span class="w"> </span><span class="n">str1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;aaa&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">str3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">&#34;aaa&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">interns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">str3</span><span class="p">.</span><span class="na">intern</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">interns</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">str1</span><span class="p">);</span><span class="c1">//返回TRUE</span><span class="w">
+</span></span></span></code></pre></div><p>intern() 方法会检查字符串常量池中是否有与之匹配的对象，并做如下操作：</p>
+<p>存在：直接返回对象引用给interns变量。</p>
+<p>不存在：将这个对象引用加入到常量池，再返回对象引用给interns变量。</p>
+<p><strong>以下创建了多少个对象呢？</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">String</span><span class="w"> </span><span class="n">str4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;abc&#34;</span><span class="o">+</span><span class="s">&#34;efg&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">String</span><span class="w"> </span><span class="n">str5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;abcefg&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">str4</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">str5</span><span class="p">);</span><span class="c1">//返回TRUE</span><span class="w">
+</span></span></span></code></pre></div><p>答案是三个。第一个：&ldquo;abc&rdquo; ，第一个：&ldquo;efg&rdquo;，第三个：&ldquo;abc&rdquo;+&ldquo;efg&rdquo;（&ldquo;abcefg&rdquo;）</p>
+<p>String str5 = &ldquo;abcefg&rdquo;; 这句代码并没有创建对象，它从常量池中找到了&quot;abcefg&quot; 的引用，所以str4 == str5 返回TRUE，因为它们都指向一个相同的对象。</p>
+<p><strong>基本类型的包装类和常量池</strong></p>
+<p>Byte、Short、Integer、Long、Character、Boolean、String 这 7 种包装类都各自实现了自己的常量池。</p>
+<p>Float 和Double 这两个浮点类型没有实现常量池。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">Integer</span><span class="w"> </span><span class="n">i1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">20</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Integer</span><span class="w"> </span><span class="n">i2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">20</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">i1</span><span class="o">==</span><span class="n">i2</span><span class="p">);</span><span class="c1">//输出TRUE</span><span class="w">
+</span></span></span></code></pre></div><p>Byte、Short、Integer、Long、Character这5种包装类都默认创建了数值[-128 , 127]的缓存数据。<strong>当这5个类型的数据不在这个区间内的时候，将会去创建新的对象，并且不会将这些新的对象放入常量池中。</strong></p>
+<hr>
+<h3 id="jvm中对象的生命周期">JVM中对象的生命周期</h3>
+<p>​	在JVM运行空间中，对象的整个生命周期大致可以分为7个阶段：创建阶段（Creation）、应用阶段（Using）、不可视阶段（Invisible）、不可到达阶段（Unreachable）、可收集阶段（Collected）、终结阶段（Finalized）与释放阶段（Free）。</p>
+<h4 id="创造阶段">创造阶段</h4>
+<p>在对象创建阶段，系统要通过下面的步骤，完成对象的创建过程：</p>
+<blockquote>
+<p>（1）为对象分配存储空间。</p>
+<p>（2）开始构造对象。</p>
+<p>（3）递归调用其超类的构造方法。</p>
+<p>（4）进行对象实例初始化与变量初始化。</p>
+<p>（5）执行构造方法体。</p>
+</blockquote>
+<p>在创建对象时，我们应该遵循一些基本的规则，以提高应用的性能：</p>
+<blockquote>
+<p><em>（1）避免在循环体中创建对象，即使该对象占用内存空间不大。</em></p>
+<p><em>（2）尽量及时使对象符合垃圾回收标准。</em></p>
+<p><em>（3）不要采用过深的继承层次。</em></p>
+<p><em>（4）访问本地变量优于访问类中的变量。</em></p>
+</blockquote>
+<h4 id="应用阶段">应用阶段</h4>
+<p>在这个阶段，对象具备下列特征：</p>
+<ul>
+<li>
+<p>系统至少维护着对象的一个强引用（StrongReference）</p>
+</li>
+<li>
+<p>所有对该对象的引用全部是强引用（除非我们显式地使用了：软引用（SoftReference）、弱引用（WeakReference）或虚引用（PhantomReference））</p>
+</li>
+</ul>
+<p><strong>强引用（StrongReference）</strong>：指JVM内存管理器从根引用集合（RootSet）出发遍寻堆中所有到达对象的路径。当到达某对象的任意路径都不含有引用对象时，对这个对象的引用就被称为强引用。</p>
+<p><strong>软引用（SoftReference）</strong>：具有较强的引用功能。<em>只有当内存不够的时候，才回收这类内存，因此在内存足够的时候，它们通常不被回收</em>。另外，<em>这些引用对象还能保证在Java抛出OutOfMemory异常之前，被设置为null</em>。它可以用于实现一些常用资源的缓存，实现Cache的功能，保证最大限度的使用内存而不引起OutOfMemory。再者，<em>软可到达对象的所有软引用都要保证在虚拟机抛出OutOfMemoryError之前已经被清除</em>。否则，清除软引用的时间或者清除不同对象的一组此类引用的顺序将不受任何约束。然而，虚拟机实现不鼓励清除最近访问或使用过的软引用。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">A</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">A</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//使用a</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//使用完了a,将它设置为soft引用类型并释放强引用</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">SoftReference</span><span class="w"> </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SoftReference</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//下次使用时</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">if</span><span class="p">(</span><span class="n">sr</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sr</span><span class="p">.</span><span class="na">get</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="k">else</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//GC由于内存资源不足可能已经回收了</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">A</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SoftReference</span><span class="p">(</span><span class="n">a</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>​	软引用技术的引进，使Java应用可以更好地管理内存，稳定系统，防止系统内存溢出，避免系统崩溃（crash）。因此在处理一些占用内存较大而且声明周期较长，但使用并不频繁的对象时应尽量应用该技术。但是在某些时候对软引用的使用会降低应用的运行效率与性能。</p>
+<p>**弱引用（WeakReference）**与Soft引用对象的最大不同就在于：GC在进行回收时，需要通过算法检查是否回收Soft引用对象，而对于Weak引用对象，GC总是进行回收。因此Weak引用对象会更容易、更快被GC回收。虽然，GC在运行时一定回收Weak引用对象，但是复杂关系的Weak对象群常常需要好几次GC的运行才能完成。Weak引用对象常常用于Map数据结构中，引用占用内存空间较大的对象，一旦该对象的强引用为null时，对这个对象引用就不存在了，GC能够快速地回收该对象空间。</p>
+<p>​	弱引用技术主要适用于实现无法防止其键（或值）被回收的规范化映射。另外，弱引用分为“短弱引用（ShortWeekReference）”和“长弱引用（LongWeekReference）”，其区别是长弱引用在对象的Finalize方法被GC调用后依然追踪对象。基于安全考虑，不推荐使用长弱引用。</p>
+<p>**虚引用（PhantomReference）**的用途较少，主要用于辅助finalize函数的使用。Phantom对象指一些执行完了finalize函数，并且为不可达对象，但是还没有被GC回收的对象。这种对象可以辅助finalize进行一些后期的回收工作，我们通过覆盖Reference的clear()方法，增强资源回收机制的灵活性。虚引用主要适用于以某种比java终结机制更灵活的方式调度pre-mortem清除操作。</p>
+<p>​	在实际程序设计中一般很少使用弱引用与虚引用，使用软引用的情况较多，这是因为<strong>软引用可以加速JVM对垃圾内存的回收速度，可以维护系统的运行安全，防止内存溢出（OutOfMemory）等问题的产生</strong>。</p>
+<h4 id="不可视阶段">不可视阶段</h4>
+<p>​	在一个对象经历了应用阶段之后，那么该对象便处于JVM对象生命周期的不可视阶段，说明我们在其他区域的代码中已经不可以再引用它，其强引用已经消失。</p>
+<h4 id="不可到达阶段">不可到达阶段</h4>
+<p>​	处于JVM对象生命周期不可到达阶段的对象，在虚拟机所管理的对象引用根集合中再也找不到直接或间接的强引用，这些对象通常是指所有线程栈中的临时变量，所有已装载的类的静态变量或者对本地代码接口（JNI）的引用。这些对象都是要被垃圾回收器回收的预备对象，但此时该对象并不能被垃圾回收器直接回收。其实所有垃圾回收算法所面临的问题是相同的——找出由分配器分配的，但是用户程序不可到达的内存块。</p>
+<h4 id="可收集阶段终结阶段与释放阶段">可收集阶段、终结阶段与释放阶段</h4>
+<p>JVM对象生命周期的最后一个阶段是可收集阶段、终结阶段与释放阶段。当对象处于这个阶段的时候，可能处于下面三种情况：</p>
+<blockquote>
+<p>（1）垃圾回收器发现该对象已经不可到达。</p>
+<p>（2）finalize方法已经被执行。</p>
+<p>（3）对象空间已被重用。</p>
+</blockquote>
+<p>当对象处于上面的三种情况时，该对象就处于可收集阶段、终结阶段与释放阶段了。虚拟机就可以直接将该对象回收了。</p>
+<hr>
+<h3 id="jvm分代垃圾回收策略">JVM分代垃圾回收策略</h3>
+<p>​        JVM分代垃圾回收策略，是基于这样一个事实：不同的对象的生命周期是不一样的。因此，不同生命周期的对象可以采取不同的收集方式，以便提高回收效率。</p>
+<p>​	在Java程序运行的过程中，会产生大量的对象，其中有些对象是与业务信息相关，比如Http请求中的Session对象、线程、Socket连接，这类对象跟业务直接挂钩，因此生命周期比较长。但是还有一些对象，主要是程序运行过程中生成的临时变量，这些对象生命周期会比较短，比如：String对象，由于其不变类的特性，系统会产生大量的这些对象，有些对象甚至只用一次即可回收。</p>
+<p>　　试想，在不进行对象存活时间区分的情况下，每次垃圾回收都是对整个堆空间进行回收，花费时间相对会长，同时，因为每次回收都需要遍历所有存活对象，但实际上，对于生命周期长的对象而言，这种遍历是没有效果的，因为可能进行了很多次遍历，但是他们依旧存在。</p>
+<p>​	因此，分代垃圾回收*采用分治的思想，进行代的划分，把不同生命周期的对象放在不同代上，*不同代上采用最适合它的垃圾回收方式进行回收。</p>
+<p>​	虚拟机中的共划分为三个代：年轻代(YoungGeneration)、年老代(OldGeneration)和持久代(PermanentGeneration)。Java堆内存分为年轻代和年老代。其中持久代主要存放的是Java类的类信息，与垃圾收集要收集的Java对象关系不大。年轻代和年老代的划分是对垃圾收集影响比较大的。</p>
+<p>​	<strong>年轻代:</strong></p>
+<p>　　所有新生成的对象首先都是放在年轻代的。年轻代的目标就是尽可能快速的收集掉那些生命周期短的对象。年轻代分三个区。一个Eden区(Eden Space伊甸园区)，两个Survivor区(Survivor Space 0 幸存者区0和 Survivor Space 1幸存者区1（默认8:1:1），也称为from区和to区)。</p>
+<p>​	大部分对象在Eden区中生成。当Eden空间不足时，触发Minor GC，存活下来的对象会被复制到From区，这时Eden区就干净了，Eden区可以继续创建新对象，再次满时，触发GC，将Eden区与From区还在被使用的对象复制到To区，再下一次GC的时候，则是将Eden区与To区中的还在被使用的对象复制到From区。经过若干次GC后，有些对象在<code>From</code>与<code>To</code>之间来回游荡，这时候<code>From</code>区与<code>To</code>区亮出了底线（阈值），这些家伙要是还没有被回收，就会被复制到老年代。（对于一些大的对象（指需要占用大量连续内存空间的对象）则直接进入到老年代。）</p>
+<p>​	<strong>Survivor的存在意义，就是减少被送到老年代的对象，进而减少Full GC的发生，Survivor的预筛选保证，只有经历16次Minor GC还能在新生代中存活的对象，才会被送到老年代。</strong></p>
+<p>​	Survivor的两个区是对称的，没先后关系。Survivor区总有一个是空的。同时，根据程序需要，Survivor区是可以配置为多个的(多于两个)，这样可以增加对象在年轻代中的存在时间，减少被放到年老代的可能。</p>
+<p>​	由于新生代中的对象大多都是临时对象，死亡率较高，因此采用复制算法（Copying）。在进行Minor GC时，会先标记出伊甸园区和其中一个幸存者区中的存活对象，并将它们复制到另一个幸存者区中，最后清空原来的两个区域。这样既能高效地回收大量死亡对象，又保持了内存的连续性。</p>
+<p><strong>复制(<code>Copying</code>)算法（标记-复制算法）</strong></p>
+<p>​	改良：不按照 1 : 1 的比例来实现复制算法，而是按照 8 : 1 : 1 的比例来分配内存空间</p>
+<p>​	将可用内存分为两块，每次只用其中一块，当一块内存用完了，就将还存活的对象复制到另外一块上，然后再把已经使用过的内存空间一次性清理掉，循环下去。这样每次只需对整个半区进行内存回收，内存分配时也不需要考虑内存碎片等复杂情况，只需要移动指针，按照顺序分配即可。</p>
+<p>​	优点：实现简单；不产生内存碎片</p>
+<p>​	缺点：内存缩小为原来的一半，代价太高</p>
+<blockquote>
+<p>现在商用虚拟机都采用复制算法来回收新生代，不过<code>1:1</code>的比例非常不科学，因此新生代的内存被划分为一块较大的<code>Eden</code>空间和两块较小的<code>Survivor</code>空间，每次使用<code>Eden</code>和其中一块<code>Survivor</code>。</p>
+<p>每次回收时，将<code>Eden</code>和<code>Survivor</code>中还存活着的对象一次性复制到另外一块<code>Survivor</code>空间上，最后清理掉<code>Eden</code>和刚才用过的<code>Survivor</code>空间。</p>
+<p><code>HotSpot</code>虚拟机默认<code>Eden</code>区和<code>Survivor</code>区的比例为<code>8:1</code>，意思是每次新生代中可用内存空间为整个新生代容量的<code>90%</code>。当然，我们无法保证每次回收都少于<code>10%</code>的对象存活，当<code>Survivor</code>空间不够用时，需要依赖老年代进行分配担保(<code>Handle Promotion</code>)。</p>
+</blockquote>
+<p>　　<strong>分配担保机制</strong></p>
+<p>​	虽然根据IBM的研究，每次GC新生代里98%的对象都会被回收，但这不是百分之百的几率，极端情况下可能会出现超过10%的对象存活。分配担保机制就是为了保证当出现这种情况时，有其他内存空间来进行兜底。通常这个“担保人”是老年代，当存活的对象超过Survivor空间大小时，这些存活的对象会忽略年龄，直接进入老年代里。</p>
+<p>​	<strong>为什么要两块Survivor空间？</strong>
+​	因为复制算法，必须要有一块空间是空闲的。想象一下，如果只有一块Eden空间 + 一块Survivor空间。当GC回收完成后，Eden中存活的对象会移动到Survivor空间。程序继续运行，新的对象又会进入Eden空间，此时就会出现 Eden 和 Survivor 空间里都有对象，复制算法也就进行不下去了。</p>
+<p>​	<strong>年老代:</strong></p>
+<p>　　在年轻代中经历了N次垃圾回收后仍然存活的对象，就会被放到年老代中。因此，可以认为年老代中存放的都是一些生命周期较长的对象。</p>
+<p>​	老年代中的对象生命周期更长，存活率高，不适合频繁地进行复制操作。因此，在老年代上一般采用标记-清除（Mark-Sweep）或者标记-压缩（Mark-Compact）算法。标记-清除算法首先标记出所有活动对象，然后清除未被标记的对象；而标记-压缩算法在清除不可达对象后还会进行内存整理，以减少内存碎片。</p>
+<p><strong>标记-清除算法(<code>Mark-Sweep</code>)</strong></p>
+<p>​	首先标记出所有需要回收的对象，标记完成后回收所有被标记的对象。</p>
+<p>​	从堆栈和静态存储区出发，遍历所有的引用，进而找出所有存活的对象，如果活着，就标记。只有全部标记完毕的时候，清理动作才开始。在清理的时候，没有标记的对象将会被释放，不会发生任何动作。但是剩下的堆空间是不连续的，垃圾回收器要是希望得到连续空间的话，就得重新整理剩下的对象。</p>
+<p>​	优点：标记—清除算法中每个活着的对象的引用只需要找到一个即可，找到一个就可以判断它为活的。此外，更重要的是，这个算法并不移动对象的位置。</p>
+<p>​	缺点：不足主要体现在效率和空间，从效率的角度讲，标记和清除效率都不高（递归与全堆对象遍历），每个活着的对象都要在标记阶段遍历一遍，所有对象都要在清除阶段扫描一遍，因此算法复杂度较高；从空间的角度讲，标记清除后会产生大量不连续的内存碎片， 内存碎片太多可能会导致需要分配较大对象时，无法找到足够的连续内存而提前触发一次垃圾收集动作。</p>
+<p><strong>标记-压缩算法（标记-整理）(<code>Mark-Compact</code>)</strong></p>
+<p>​	过程与标记-清除算法一样，不过不是直接对可回收对象进行清理，而是让所有存活对象都向一端移动，然后直接清理掉边界以外的内存。在标记阶段，该算法也将所有对象标记为存活和死亡两种状态；不同的是，在第二个阶段，该算法并没有直接对死亡的对象进行清理，而是将所有存活的对象整理一下，放到另一处空间，然后把剩下的所有对象全部清除。这样就达到了标记-整理的目的。</p>
+<p>​	优点：该算法不会像标记-清除算法那样产生大量的碎片空间。</p>
+<p>​	缺点：如果存活的对象过多，整理阶段将会执行较多复制操作，导致算法效率降低。</p>
+<p>　　<strong>持久代（元空间）:</strong></p>
+<p>　　用于存放静态文件，如今Java类、方法等。持久代对垃圾回收没有显著影响，但是有些应用可能动态生成或者调用一些class，例如Hibernate等，在这种时候需要设置一个比较大的持久代空间来存放这些运行过程中新增的类。</p>
+<p>​	从存储位置来看，持久代是是堆的一部分，和新生代，老年代地址是连续的，而元空间属于本地内存；存储内容不同，元空间存储类的元信息，静态变量和常量池等并入堆中。相当于持久代的数据被分到了堆和元空间中。</p>
+<h4 id="跨代引用的问题">跨代引用的问题</h4>
+<p>​	举个例子，新生代中的对象很有可能会被老年代里的对象所引用，当新生代触发GC的时候，只搜索新生代的区域明显是不够的，还得搜索老年代的对象是否引用了新生代中非 GC Roots 引用链上的对象，来确保正确性。但这样做会带来很大的性能开销。为了解决这个问题，Java定义了一种名为记忆集的抽象的数据结构，用于记录存在跨区域引用的对象指针集合。</p>
+<p>​	大多数的虚拟机，都采用一种名为**卡表（Card Table）**的方式去实现记忆集，卡表由一个数组构成，每一个元素都对应着一块特定大小的内存区域，这块内存区域被称之为卡页（Card Page），每一个卡页，可能会包含N个存在跨区域引用的对象，只要存在跨区域引用的对象，这个卡页就会被标识为1。当GC发生的时候，就不需要扫描整个区域了，只需要把这些被标识为1的卡页加入对应区域的 GC Roots 里一起扫描即可。</p>
+<h4 id="q--a">Q &amp; A</h4>
+<p><strong>为什么老年代不使用和新生代一样的标记-复制算法呢？</strong></p>
+<blockquote>
+<p>​	新生代里绝大多数对象都是朝生夕死的，使用的标记-复制算法，空间占比可以8 : 1 : 1，但是老年代里对象存活率很高，这个占比明显不合适。</p>
+<p>​	如果占比得设置得大 (例如50%)，又会浪费很多内存空间，而且由于对象很多都是存活的，复制移动也是一笔开销。所以标记-复制这个算法，不适合老年代这种对象存活率很高的区域。</p>
+</blockquote>
+<p><strong>标记-整理（压缩）算法，每次整理都消耗大量时间，能不能优化一下？</strong></p>
+<blockquote>
+<p>​	可以通过设置一个阈值或者临界点，当内存碎片化程度还在这个阈值范围内的时候，仅采用标记-清除算法。只有超过这个阈值，才进行整理。</p>
+</blockquote>
+<p><strong>什么是内存碎片？它会带来什么问题？</strong></p>
+<blockquote>
+<p>回收完成后，会产生很多不连续的内存空间，这就是内存碎片。
+Java虚拟机对于大对象（例如很长的字符串、byte数组等等），都必须存储在连续的内存空间里，当一个大对象需要进入某个内存空间时，由于内存碎片过多，虽然剩余内存是远大于这个对象所需空间的，但就是找不到一块连续的内存空间来存储它，这会导致提前触发一次Full GC。</p>
+</blockquote>
+<p><strong>CPU飙高排查方案与思路？</strong></p>
+<blockquote>
+<p>1.执行top命令：查看所有进程占系统CPU的排序。极大可能排第一个的就是咱们的java进程（COMMAND列）。PID那一列就是进程号。</p>
+<p>2.执行top -Hp 进程号命令：查看java进程下的所有线程占CPU的情况。</p>
+<p>3.执行“printf &ldquo;%x\n 10&quot;命令 ：后续查看线程堆栈信息展示的都是十六进制，为了找到咱们的线程堆栈信息，咱们需要把线程号转成16进制。例如，打印：a，那么在jstack中线程号就是0xa.</p>
+<p>4.执行 “jstack 进程号 | grep 线程ID” 查找某进程下线程ID（jstack堆栈信息中的nid）=0xa的线程状态。如果“&ldquo;VM Thread&rdquo; os_prio=0 tid=0x00007f871806e000 nid=0xa runnable”，第一个双引号圈起来的就是线程名，如果是“VM Thread”这就是虚拟机GC回收线程了</p>
+<p>5.执行“jstat -gcutil 进程号 统计间隔毫秒 统计次数（缺省代表一致统计）”，查看某进程GC持续变化情况，如果发现返回中FGC很大且一直增大，确认Full GC! 也可以使用“jmap -heap 进程ID”查看一下进程的堆内从是不是要溢出了，特别是老年代内从使用情况一般是达到阈值(具体看垃圾回收器和启动时配置的阈值)就会进程Full GC。</p>
+<p>6.执行“jmap -dump:format=b,file=filename 进程ID”，导出某进程下内存heap输出到文件中。</p>
+</blockquote>
+<hr>
+<h2 id="创建多线程的一些写法">创建多线程的一些写法</h2>
+<p><strong>严格来说，Java 就只有一种方式可以创建线程，那就是通过<code>New Thread().Start()</code>创建。不管是哪种方式，最终还是依赖于<code>New Thread().Start()</code>。</strong></p>
+<hr>
+<h3 id="runnable接口">Runnable接口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@FunctionalInterface</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Runnable</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>举一个例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ImplementsRunnable</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nd">@Override</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34; is running&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>但是当我们实现Runnable接口并重写run方法时的确创建了一个线程，但是启动线程的方法应该是怎样的？</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">ImplementsRunnable</span><span class="w"> </span><span class="n">runnable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ImplementsRunnable</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">runnable</span><span class="p">.</span><span class="na">run</span><span class="p">();</span><span class="c1">//main is running</span><span class="w">
+</span></span></span></code></pre></div><p>这种启动方法是错误的，可以看见是main线程在运行，正确的启动方法应该是这样的：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="n">runnable</span><span class="p">).</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//进入到Thread方法内部，可以看到这是Thread类的一个构造函数：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="nf">Thread</span><span class="p">(</span><span class="n">Runnable</span><span class="w"> </span><span class="n">task</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">this</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="n">task</span><span class="p">,</span><span class="w"> </span><span class="n">0</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">//等价于Thread.ofPlatform().unstarted(task); </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//this 关键字的作用是指示当前构造函数调用的是 Thread 类的其他构造函数：</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="p">(</span><span class="n">ThreadGroup</span><span class="w"> </span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">characteristics</span><span class="p">,</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="n">task</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="kt">long</span><span class="w"> </span><span class="n">stackSize</span><span class="p">,</span><span class="w"> </span><span class="n">AccessControlContext</span><span class="w"> </span><span class="n">acc</span><span class="p">){......}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cm">/*ThreadGroup g：线程组，用于管理线程。
+</span></span></span><span class="line"><span class="cl"><span class="cm">String name：线程的名称。
+</span></span></span><span class="line"><span class="cl"><span class="cm">int characteristics：线程的特征，例如线程的优先级等。
+</span></span></span><span class="line"><span class="cl"><span class="cm">Runnable task：线程要执行的任务。
+</span></span></span><span class="line"><span class="cl"><span class="cm">long stackSize：线程的堆栈大小。
+</span></span></span><span class="line"><span class="cl"><span class="cm">AccessControlContext acc：访问控制上下文，用于控制对系统资源的访问。*/</span><span class="w">
+</span></span></span></code></pre></div><hr>
+<h3 id="callable接口">Callable接口</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@FunctionalInterface</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Callable</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * Computes a result, or throws an exception if unable to do so.
+</span></span></span><span class="line"><span class="cl"><span class="cm">     *
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * @return computed result
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * @throws Exception if unable to compute a result
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">V</span><span class="w"> </span><span class="nf">call</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>通过与Future的结合，可以实现利用Future来跟踪异步计算的结果，运行Callable任务可以拿到一个Future对象,表示异步计算的结果,它提供了检查是否计算完成的方法,以等待计算的完成,并检索计算的结果,通过Future对象可以了解任务执行情况,可以取消任务的执行,还可以获取执行结果。</p>
+<h4 id="futurev接口">Future&lt;V&gt;接口</h4>
+<p><code>Future</code> 是 Java 提供的一个接口，用于表示异步计算的结果。它允许我们在一个线程中提交一个任务，然后在另一个线程中获取任务的执行结果。虽然 <code>Future</code> 提供了一种简单的方式来进行异步编程，但它的功能有限，不能很好地处理复杂的并发场景。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kt">boolean</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="kt">boolean</span><span class="w"> </span><span class="n">mayInterruptIfRunning</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="cm">/*试图取消执行此任务。如果任务已经完成或取消，或者由于其他原因无法取消，则此方法无效。否则，如果在调用取消时此任务尚未启动，则此任务永远不应运行。如果任务已经启动，那么mayInterruptIfRunning参数确定执行此任务的线程是否被中断，以尝试停止任务。如果执行此任务的线程应中断，则mayInterruptIfRunning为真。
+</span></span></span><span class="line"><span class="cl"><span class="cm">此方法的返回值不一定指示任务现在是否被取消；需要使用isCancelled()。*/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isCancelled</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">default</span><span class="w"> </span><span class="n">Throwable</span><span class="w"> </span><span class="nf">exceptionNow</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">V</span><span class="w"> </span><span class="nf">get</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">InterruptedException</span><span class="p">,</span><span class="n">ExecutionException</span><span class="p">;</span><span class="c1">//必要时等待计算完成，然后检索其结果。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">V</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">timeout</span><span class="p">,</span><span class="n">TimeUnit</span><span class="w"> </span><span class="n">unit</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w">  </span><span class="n">InterruptedException</span><span class="p">,</span><span class="n">ExecutionException</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">TimeoutException</span><span class="c1">//增加一个时间限制的get</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isDone</span><span class="p">();</span><span class="cm">/*如果此任务完成，则返回true。完成可能是由于正常终止、例外或取消——在所有这些情况下，此方法将返回true。*/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">default</span><span class="w"> </span><span class="n">V</span><span class="w"> </span><span class="nf">resultNow</span><span class="p">();</span><span class="cm">/*返回计算结果，无需等待。此方法适用于调用者知道任务已成功完成的情况，适用于流式编程*/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">default</span><span class="w"> </span><span class="n">Future</span><span class="p">.</span><span class="na">State</span><span class="w"> </span><span class="nf">state</span><span class="p">();</span><span class="w">
+</span></span></span></code></pre></div><h3 id="futuretask类">FutureTask类</h3>
+<p>FutureTask是一个继承自RunnableFuture接口的类，是Future接口的唯一实现类，关于RunnableFuture：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">RunnableFuture</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Runnable</span><span class="p">,</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * 将此future设置为计算结果，除非它被取消
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>关于FutureTask类，有两个构造函数：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="nf">FutureTask</span><span class="p">(</span><span class="n">Runnable</span><span class="w"> </span><span class="n">runnable</span><span class="p">,</span><span class="n">V</span><span class="w"> </span><span class="n">result</span><span class="p">){.....}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="nf">FutureTask</span><span class="p">(</span><span class="n">Callable</span><span class="o">&lt;</span><span class="n">V</span><span class="o">&gt;</span><span class="w"> </span><span class="n">callable</span><span class="p">){....}</span><span class="w">
+</span></span></span></code></pre></div><p>由于接口继承了Runnable接口和Future接口，因此FutureTask类既可以当做线程任务递交给线程池执行，又能当Callable任务的计算结果。</p>
+<h3 id="使用executorservice线程池">使用ExecutorService线程池</h3>
+<p><strong>内存一致性效应</strong>：在向ExecutorService提交可运行或可调用任务之前，线程中的操作发生在该任务采取的任何操作之前，而这些操作又发生在通过Future.get（）检索结果之前。</p>
+<p>ExecutorService是一个接口，继承自Executor接口和AutoCloseable接口。</p>
+<p><code>Executor</code> 表示一个可以执行任务的执行器。它只有一个方法 <code>execute(Runnable command)</code>，用于提交一个 Runnable 任务。<code>AutoCloseable</code> 表示一个需要自动关闭的资源。它只有一个方法 <code>close()</code>，用于关闭资源。</p>
+<p><code>AutoCloseable</code> 接口常用于实现自动资源管理，例如数据库连接、文件流等。当使用 <code>try-with-resources</code> 语句时，如果一个类实现了 <code>AutoCloseable</code> 接口，那么在 <code>try</code> 代码块执行完毕后，它会自动调用 <code>close()</code> 方法关闭资源。这样可以确保资源在使用完毕后被正确关闭，避免资源泄漏。</p>
+<h4 id="实现线程池">实现线程池</h4>
+<p>ExecutorService 表述了异步执行的机制，并且可以让任务在后台执行。一个 ExecutorService 实例因此特别像一个线程池。一个简单的例子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">executorService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newFixedThreadPool</span><span class="p">(</span><span class="n">10</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">executorService</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Runnable</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Asynchronous task&#34;</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">executorService</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span><span class="w">
+</span></span></span></code></pre></div><p>ExecutorService 的一些实现类，创建这些线程池的方法都被封装到<code>Executors</code>这个类中：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ExecutorService</span><span class="w"> </span><span class="nf">newSingleThreadExecutor</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">newSingleThreadExecutor</span><span class="p">(</span><span class="n">defaultThreadFactory</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ExecutorService</span><span class="w"> </span><span class="nf">newSingleThreadExecutor</span><span class="p">(</span><span class="n">ThreadFactory</span><span class="w"> </span><span class="n">threadFactory</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AutoShutdownDelegatedExecutorService</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">1</span><span class="p">,</span><span class="w"> </span><span class="n">1</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                    </span><span class="n">0L</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MILLISECONDS</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                    </span><span class="k">new</span><span class="w"> </span><span class="n">LinkedBlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span><span class="p">(),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                    </span><span class="n">threadFactory</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>创建一个单线程的线程池。这个线程池中的所有任务都会被顺序执行，并且只有一个线程来执行这些任务。这个方法创建的线程池中的线程是守护线程，这意味着当主线程退出时，守护线程也会退出，即使它们正在执行任务。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ExecutorService</span><span class="w"> </span><span class="nf">newFixedThreadPool</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">nThreads</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">nThreads</span><span class="p">,</span><span class="w"> </span><span class="n">nThreads</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                      </span><span class="n">0L</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MILLISECONDS</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                      </span><span class="k">new</span><span class="w"> </span><span class="n">LinkedBlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>创建一个固定大小的线程池。这个线程池中的所有任务都会被顺序执行，并且有 <code>nThreads</code> 个线程来执行这些任务。 创建的线程也是守护线程</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ScheduledExecutorService</span><span class="w"> </span><span class="nf">newScheduledThreadPool</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">corePoolSize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ScheduledThreadPoolExecutor</span><span class="p">(</span><span class="n">corePoolSize</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ScheduledExecutorService</span><span class="w"> </span><span class="nf">newScheduledThreadPool</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">corePoolSize</span><span class="p">,</span><span class="w"> </span><span class="n">ThreadFactory</span><span class="w"> </span><span class="n">threadFactory</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ScheduledThreadPoolExecutor</span><span class="p">(</span><span class="n">corePoolSize</span><span class="p">,</span><span class="w"> </span><span class="n">threadFactory</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>创建一个固定大小的线程池，这个线程池中的线程可以按照固定的频率执行任务。返回一个 <code>ScheduledExecutorService</code> 对象，<code>ScheduledExecutorService</code> 是一个接口，它表示一个可以执行定时任务的执行器。它主要有两个方法：<code>schedule()</code> 和 <code>scheduleAtFixedRate()</code>，分别用于提交一个定时任务和一个固定频率的任务。<code>schedule()</code> 方法用于提交一个在给定延迟后执行的任务。它接受一个 <code>Runnable</code> 对象和一个 <code>DelayedExecutionContext</code> 对象作为参数，<code>DelayedExecutionContext</code> 对象表示任务的延迟时间。<code>scheduleAtFixedRate()</code> 方法用于提交一个按照固定频率执行的任务。它接受一个 <code>Runnable</code> 对象、一个 <code>long</code> 类型的周期和一个 <code>TimeUnit</code> 类型的周期单位作为参数。</p>
+<h4 id="将任务委托给executorservice的方式">将任务委托给ExecutorService的方式</h4>
+<p><strong>execute(Runnable)</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">executorService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newSingleThreadExecutor</span><span class="p">();</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">executorService</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Runnable</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Asynchronous task&#34;</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">executorService</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span><span class="w">
+</span></span></span></code></pre></div><p>没法获取执行 Runnable 之后的结果</p>
+<p><strong>submit(Runnable)/submit(Callable)</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">Future</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executorService</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Runnable</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;Asynchronous task&#34;</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">//如果任务结束执行则返回 null  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;future.get()=&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">future</span><span class="p">.</span><span class="na">get</span><span class="p">());</span><span class="w">
+</span></span></span></code></pre></div><p>接收Runnable 的实现作为参数，返回 Future 对象。这个Future 对象可以用于判断 Runnable 是否结束执行。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">ExecutorService</span><span class="w"> </span><span class="n">executor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newCachedThreadPool</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">futureResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executor</span><span class="p">.</span><span class="na">submit</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Callable</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nd">@Override</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">call</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">2000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="s">&#34;Hello, Future!&#34;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">futureResult</span><span class="p">.</span><span class="na">get</span><span class="p">();</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">);}</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">executor</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span><span class="w">
+</span></span></span></code></pre></div><h3 id="linkedblockingqueue">LinkedBlockingQueue</h3>
+<h3 id="threadfactory">ThreadFactory</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">ThreadFactory</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Thread</span><span class="w"> </span><span class="nf">newThread</span><span class="p">(</span><span class="nd">@NotNull</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="n">r</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h2 id="completablefuture类">CompletableFuture类</h2>
+<p>CompletableFuture` 是 Java 8 引入的一个类，提供了更强大和灵活的异步编程功能。它允许我们链式地组合多个异步操作，处理异常情况，并在任务完成时执行特定的回调函数。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="line"><span class="cl"><span class="n">CompletableFuture</span><span class="p">.</span><span class="na">supplyAsync</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s">&#34;Hello&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="na">thenApplyAsync</span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;, CompletableFuture!&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="na">thenAcceptAsync</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">::</span><span class="n">println</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">.</span><span class="na">join</span><span class="p">();</span><span class="w">
+</span></span></span></code></pre></div><p>当我们异步执行一个任务时，一般是用线程池Executor去创建。如果不需要有返回值， 任务实现Runnable接口；如果需要有返回值，任务实现Callable接口，调用Executor的submit方法，再使用Future获取即可。如果多个线程存在依赖组合的话，我们怎么处理呢？   使用CompletableFuture</p>
+<p><a href="https://juejin.cn/post/6970558076642394142" target="_blank" rel="noopener noreffer ">https://juejin.cn/post/6970558076642394142</a></p>
+<hr>
+<ol>
+<li>基于ThreadGroup线程组</li>
+<li>使用匿名内部类或Lambda表达式</li>
+<li>使用Timer定时器类</li>
+<li>使用ForkJoin线程池或Stream并行流</li>
+</ol>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-03-18</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="http://localhost:1313/posts/03/" data-title="JVM和Java多线程"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="http://localhost:1313/posts/03/"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="http://localhost:1313/posts/03/" data-title="JVM和Java多线程"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="http://localhost:1313/posts/03/" data-title="JVM和Java多线程"><i data-svg-src="/lib/simple-icons/icons/line.min.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="http://localhost:1313/posts/03/" data-title="JVM和Java多线程"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/02/" class="prev" rel="prev" title="Stream流式编程"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Stream流式编程</a>
+            <a href="/posts/04/" class="next" rel="next" title="认识Java集合类 &amp; 部分并发基础">认识Java集合类 & 部分并发基础<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="sb.com" target="_blank">天水的魚</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/lightgallery/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="/lib/katex/katex.min.css"><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js"></script><script type="text/javascript" src="/lib/lunr/lunr.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js"></script><script type="text/javascript" src="/lib/twemoji/twemoji.min.js"></script><script type="text/javascript" src="/lib/lightgallery/lightgallery.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="/lib/lightgallery/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/typeit/index.umd.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/auto-render.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/copy-tex.min.js"></script><script type="text/javascript" src="/lib/katex/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"data":{"id-1":"魚的个人博客","id-2":"魚的个人博客"},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"lunr"},"twemoji":true,"typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"id-1":["id-1"],"id-2":["id-2"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

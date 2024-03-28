@@ -111,6 +111,44 @@
         alt="01.png"
         title="01.png" /></a></div><div class="home-subtitle"><div id="id-3" class="typeit"></div></div><div class="links"><a href="https://github.com/zcralx" title="GitHub" target="_blank" rel="noopener noreffer me"><i class="fab fa-github fa-fw" aria-hidden="true"></i></a><a href="https://space.bilibili.com/2059347827" title="bilibili" target="_blank" rel="noopener noreffer me"><i data-svg-src="/lib/simple-icons/icons/bilibili.min.svg" aria-hidden="true"></i></a><a href="mailto:zcralx8850@outlook.com" title="Email" rel="me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/04/">认识Java集合类 & 部分并发基础</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span>&nbsp;<span class="post-publish">published on <time datetime="2024-03-26">2024-03-26</time></span></div><div class="content">认识Java集合类 &amp; 部分并发基础 [TOC]
+Collection接口 Queue Queue与List、Set属于同一个级别接口，它们都是继承于Collection接口。
+public interface Queue&lt;E&gt; extends Collection&lt;E&gt; { boolean add(E e);//向队列中添加一个元素；如果有空间则添加成功返回true，否则则抛出IllegalStateException异常 boolean offer(E e);//向队列中添加一个元素；如果有空间则添加成功返回true，否则返回false E remove();//从队列中删除一个元素；如果元素存在则返回队首元素，否则抛出NoSuchElementException异常 E poll();//从队列中删除一个元素；如果元素存在则返回队首元素，否则返回null E element();//从队列获取一个元素，但是不删除；如果元素存在则返回队首元素，否则抛出NoSuchElementException异常 E peek();//从队列获取一个元素，但是不删除；如果元素存在则返回队首元素，否则返回null } Deque双端队列 ​	双端队列就是可以支持在队首或者队尾，都可以进行元素的插入和删除操作的队列。操作方法与Queue的操作方法类似，只是指定了在队首还是队尾进行元素操作。
+public interface Deque&lt;E&gt; extends Queue&lt;E&gt; { // 向队首添加一个元素；如果有空间则添加成功返回true，否则则抛出IllegalStateException异常 void addFirst(E e); // 向队尾添加一个元素；如果有空间则添加成功返回true，否则则抛出IllegalStateException异常 void addLast(E e); // 向队首添加一个元素；如果有空间则添加成功返回true，否则返回false boolean offerFirst(E e); // 向队尾添加一个元素；如果有空间则添加成功返回true，否则返回false boolean offerLast(E e); // 从队首删除一个元素；如果元素存在则返回队首元素，否则抛出NoSuchElementException异常 E removeFirst(); // 从队尾删除一个元素；如果元素存在则返回队尾元素，否则抛出NoSuchElementException异常 E removeLast(); // 从队首删除一个元素；如果元素存在则返回队首元素，否则返回null E pollFirst(); // 从队尾删除一个元素；如果元素存在则返回队首元素，否则返回null E pollLast(); // 从队首获取一个元素，但是不删除；如果元素存在则返回队首元素，否则抛出NoSuchElementException异常 E getFirst(); // 从队尾获取一个元素，但是不删除；如果元素存在则返回队尾元素，否则抛出NoSuchElementException异常 E getLast(); // 从队首获取一个元素，但是不删除；如果元素存在则返回队首元素，否则返回null E peekFirst(); // 从队尾获取一个元素，但是不删除；如果元素存在则返回队尾元素，否则返回null E peekLast(); // 如果元素o存在，则从队列中删除第一次出现的该元素 boolean removeFirstOccurrence(Object o); // 如果元素o存在，则从队列中删除最后一次出现的该元素 boolean removeLastOccurrence(Object o); // 其他方法省略.</div><div class="post-footer">
+        <a href="/posts/04/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/03/">JVM和Java多线程</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span>&nbsp;<span class="post-publish">published on <time datetime="2024-03-18">2024-03-18</time></span></div><div class="content">JVM和Java多线程 [TOC]
+JVM的运行机制及基本原理 ​	当前市面上使用范围最广的，是Sun/OracleJDK或者OpenJDK中默认的 HotSpot 虚拟机。市面上还存在很多非常优秀的Java虚拟机，它们都遵循Java虚拟机规范，但具体的实现上各有特点，在某一个领域拥有突出的性能优势是它们最重要的卖点。例如IBM的J9，Azul Systems 的 Azul VM 等等。
+JVM的生命周期 ​	JVM在Java程序开始运行的时候，它才运行，程序结束的时它就停止。
+一个Java程序会开启一个JVM进程，如果一台机器上运行3个Java程序，那么就会有3个运行中的JVM进程。
+JVM中的线程分为两种：守护线程和普通线程
+守护线程是JVM自己使用的线程，比如垃圾回收（GC）就是一个守护线程。
+普通线程一般是Java程序的线程，只要JVM中有普通线程在执行，那么JVM就不会停止。
+在如下几种情况下，Java虚拟机将结束生命周期：
+1、执行了System.exit()方法
+2、程序正常执行结束
+3、程序在执行过程中遇到了异常或错误而终止进程
+4、由于操作系统出现错误而导致Java虚拟机进程终止
+JVM的结构体系 Class文件 ​	Class文件由Java编译器生成，我们创建的.Java文件在经过编译器后，会变成.Class的文件，这样才能被JVM所识别并运行。
+​	Class文件的核心设计思想是 平台无关性，它存储的不是操作系统可以直接识别的二进制本地机器码，而是根据Java虚拟机规范所自定义的指令集、符号表和一些其他信息，所以只要任何一个操作系统下开发有对应的Java虚拟机，开发者的Java程序就能跑起来。
+查看Class文件（二进制）
+xxd Hello.class Class文件组成 详见：https://javabetter.cn/jvm/class-file-jiegou.html
+魔数（cafebabe）
+第一行中有一串特殊的字符 cafebabe，它就是一个魔数，是 JVM 识别 class 文件的标志，JVM 会在验证阶段检查 class 文件是否以该魔数开头，如果不是则会抛出 ClassFormatError。
+版本号
+紧跟着魔数后面的四个字节 0000 0037 分别表示副版本号和主版本号。也就是说，主版本号为 55（0x37 的十进制），也就是 Java 11 对应的版本号，副版本号为 0。
+常量池
+紧跟在版本号之后的是常量池，它包含了类、接口、字段和方法的符号引用，以及字符串字面量和数值常量。这些信息在编译时被创建，并在运行时被Java虚拟机（JVM）使用。
+访问标记
+紧跟着常量池之后的区域就是访问标记（Access flags），这个标记用于识别类或接口的访问信息。
+类索引、父类索引和接口索引
+这三部分用来确定类的继承关系，this_class 为当前类的索引，super_class 为父类的索引，interfaces 为接口。
+字段表
+一个类中定义的字段会被存储在字段表（fields）中，包括静态的和非静态的。</div><div class="post-footer">
+        <a href="/posts/03/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/02/">Stream流式编程</a>
     </h1><div class="post-meta"><span class="post-author"><a href="sb.com" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>天水的魚</a></span>&nbsp;<span class="post-publish">published on <time datetime="2024-03-17">2024-03-17</time></span></div><div class="content">Stream流式编程 [TOC]
 了解Stream Stream 是 Java8 添加的一个新的抽象称为流，可以让你以一种声明的方式处理数据。通过使用流，我们可以说明想要完成什么任务，而不是说明如何去实现它。我们将操作的调度留给具体实现去解决。例如，假设我们想要计算某个属性的平均值，那么我们就可以指定数据源和该属性，然后，流库就可以对计算进行优化，例如，使用多线程来计算总和与个数，并将结果合并。 Stream 可以极大提高Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。 Stream 流的操作是以管道的方式串起来的。管道以数据源开始，包含若干个中间操作，最终以终点操作结束(规约操作）。 流并不存储其元素。这些元素可能存储在底层的集合中，或者是按需生成的。 流的操作不会修改其数据源。例如，filter 方法不会从流中移除元素，而是会生成一 个新的流，其中不包含被过滤掉的元素。 流的操作是尽可能惰性执行的。这意味着直至需要其结果时，操作才会执行。因此，我们甚至可以操作无限流。 操作流的典型流程 建立一个包含三个阶段的操作管道：

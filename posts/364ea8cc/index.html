@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zcralx.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.19.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"show_result":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="设计模式总体来说设计模式分为三大类：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式">
+<meta property="og:url" content="https://zcralx.github.io/posts/364ea8cc/index.html">
+<meta property="og:site_name" content="zcralx&#39;s blog">
+<meta property="og:description" content="设计模式总体来说设计模式分为三大类：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zcralx.github.io/assets/img/08.jpg">
+<meta property="article:published_time" content="2024-04-10T13:11:22.000Z">
+<meta property="article:modified_time" content="2024-06-05T13:43:34.501Z">
+<meta property="article:author" content="魚">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zcralx.github.io/assets/img/08.jpg">
+
+
+<link rel="canonical" href="https://zcralx.github.io/posts/364ea8cc/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zcralx.github.io/posts/364ea8cc/","path":"posts/364ea8cc/","title":"设计模式"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>设计模式 | zcralx's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">zcralx's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多喜乐，长安宁，愿你一切都好</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">29</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">12</span></a></li><li class="menu-item menu-item-象棋"><a href="/xiangqi/" rel="section"><i class="fa fa-chess-rook fa-fw"></i>象棋</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+  
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F-Strategy-Pattern"><span class="nav-number">1.1.</span> <span class="nav-text">策略模式(Strategy Pattern)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">策略模式的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F-Proxy-Pattern"><span class="nav-number">1.2.</span> <span class="nav-text">代理模式(Proxy Pattern)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">代理模式的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F-Singleton-Pattern"><span class="nav-number">1.3.</span> <span class="nav-text">单例模式(Singleton Pattern)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.3.1.</span> <span class="nav-text">单例模式的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F-Factory-Method-Pattern"><span class="nav-number">1.4.</span> <span class="nav-text">工厂方法模式(Factory Method Pattern)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.4.1.</span> <span class="nav-text">工厂方法模式的作用</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="魚"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">魚</p>
+  <div class="site-description" itemprop="description">yuyu6661@foxmail.com</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zcralx" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zcralx" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/zzzzzzzzzzz-90-37" title="zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;zzzzzzzzzzz-90-37" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zcralx.github.io/posts/364ea8cc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="魚">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zcralx's blog">
+      <meta itemprop="description" content="yuyu6661@foxmail.com">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="设计模式 | zcralx's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-04-10 21:11:22" itemprop="dateCreated datePublished" datetime="2024-04-10T21:11:22+08:00">2024-04-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-06-05 21:43:34" itemprop="dateModified" datetime="2024-06-05T21:43:34+08:00">2024-06-05</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>16 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/assets/img/08.jpg" alt="桌面图片" title="少女的侧脸"></p>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=2129898729&auto=0&height=66"></iframe>
+
+<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><p>总体来说设计模式分为三大类：</p>
+<span id="more"></span>
+
+<ol>
+<li><p>创建型模式，共五种：工厂方法模式、抽象工厂模式、单例模式、建造者模式、原型模式。</p>
+</li>
+<li><p>结构型模式，共七种：适配器模式、装饰器模式、代理模式、外观模式、桥接模式、组合模式、享元模式。</p>
+</li>
+<li><p>行为型模式，共十一种：策略模式、模板方法模式、观察者模式、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式。</p>
+</li>
+</ol>
+<p>其实还有两类：并发型模式和线程池模式。</p>
+<h2 id="策略模式-Strategy-Pattern"><a href="#策略模式-Strategy-Pattern" class="headerlink" title="策略模式(Strategy Pattern)"></a>策略模式(Strategy Pattern)</h2><p>刘备要到江东娶老婆了，走之前诸葛亮给赵云(伴郎)三个锦囊妙计，说是按天机拆开解决棘手问题， 嘿，还别说，真是解决了大问题，搞到最后是周瑜陪了夫人又折兵呀，那咱们先看看这个场景是什么样子的。</p>
+<p>先说这个场景中的要素：三个妙计，一个锦囊，一个赵云，妙计是小亮同志给的，妙计是放置在锦囊里，俗称就是锦囊妙计嘛，那赵云就是一个干活的人，从锦囊中取出妙计-&gt;执行-&gt;然后获胜。</p>
+<p>三个妙计是同一类型的东西，那咱就写个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IStrategy</span> &#123;</span><br><span class="line">    <span class="comment">//每个妙计都是一个可执行的算法</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operate</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后再写三个实现类，这就是三个妙计：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BackDoor</span> <span class="keyword">implements</span> <span class="title class_">IStrategy</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operate</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;找乔国老帮忙，让吴国太给孙权施加压力&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GivenGreenLight</span> <span class="keyword">implements</span> <span class="title class_">IStrategy</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operate</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;求吴国太开个绿灯,放行!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BlockEnemy</span> <span class="keyword">implements</span> <span class="title class_">IStrategy</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operate</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;孙夫人断后，挡住追兵&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//子类在实现某个接口的方法时最好加上@override，这里省略掉了</span></span><br></pre></td></tr></table></figure>
+
+<p>再写一个锦囊存放这三个妙计：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Context</span> &#123; <span class="comment">//构造函数，你要使用那个妙计</span></span><br><span class="line">	<span class="keyword">private</span> IStrategy straegy;</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">Context</span><span class="params">(IStrategy strategy)</span>&#123;</span><br><span class="line">		<span class="built_in">this</span>.straegy = strategy; </span><br><span class="line">  &#125;</span><br><span class="line">	<span class="comment">//使用计谋了，看我出招了 </span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">operate</span><span class="params">()</span>&#123;</span><br><span class="line">		<span class="built_in">this</span>.straegy.operate(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就是赵云使用这三个妙计：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ZhaoYun</span> &#123;</span><br><span class="line">	<span class="comment">//赵云出场了，他根据诸葛亮给他的交代，依次拆开妙计</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; </span><br><span class="line">    Context context;</span><br><span class="line">		<span class="comment">//刚刚到吴国的时候拆第一个 </span></span><br><span class="line">    context = <span class="keyword">new</span> <span class="title class_">Context</span>(<span class="keyword">new</span> <span class="title class_">BackDoor</span>()); <span class="comment">//拿到妙计</span></span><br><span class="line">		context.operate(); <span class="comment">//执行第一个锦囊</span></span><br><span class="line">    <span class="comment">//刘备乐不思蜀了，拆第二个了 </span></span><br><span class="line">    context = <span class="keyword">new</span> <span class="title class_">Context</span>(<span class="keyword">new</span> <span class="title class_">GivenGreenLight</span>());</span><br><span class="line">    context.operate(); <span class="comment">//执行第二个锦囊</span></span><br><span class="line">		<span class="comment">//孙权的小兵追了，咋办?拆第三个</span></span><br><span class="line">		context = <span class="keyword">new</span> <span class="title class_">Context</span>(<span class="keyword">new</span> <span class="title class_">BlockEnemy</span>()); </span><br><span class="line">    context.operate(); <span class="comment">//执行第二个锦囊</span></span><br><span class="line">    <span class="comment">//孙夫人退兵</span></span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="策略模式的作用"><a href="#策略模式的作用" class="headerlink" title="策略模式的作用"></a>策略模式的作用</h3><p>策略模式在软件设计中具有以下重要作用：</p>
+<blockquote>
+<ol>
+<li><p><strong>封装算法族</strong>：策略模式将一组相关的算法封装成一系列可相互替换的具体策略类，每个策略类代表一个具体的算法或行为。这样，将算法的实现细节与使用算法的客户端代码分离，实现了算法的封装。</p>
+</li>
+<li><p><strong>支持算法切换</strong>：策略模式允许在运行时根据需要动态地选择和切换算法。客户端通过改变所持有的策略对象，就可以改变系统的行为，无需修改客户端代码或目标对象的结构。这种灵活性使得系统易于适应不同情境或用户需求的变化。</p>
+</li>
+<li><p><strong>消除条件分支</strong>：在没有使用策略模式的情况下，若系统中包含大量基于条件判断的代码（如if-else语句或switch-case结构），以选择不同的行为。策略模式通过引入策略对象，可以将这些条件分支逻辑替换为简单的策略对象的替换操作，使得代码更简洁、更易于理解和维护。</p>
+</li>
+<li><p><strong>易于扩展新算法</strong>：当需要添加新的算法或修改现有算法时，只需要新增一个策略类或修改已有策略类，客户端代码无需变动。这种对开放扩展、封闭修改的遵循体现了“开闭原则”，增强了系统的可扩展性。</p>
+</li>
+<li><p><strong>松散耦合</strong>：策略模式通过策略接口或抽象策略类将客户端与具体策略类解耦。客户端依赖于抽象策略，而不直接依赖于具体策略，降低了组件间的耦合度，使得各个策略之间互不影响，容易进行单元测试，也便于在不影响其他代码的情况下进行重构。</p>
+</li>
+<li><p><strong>支持组合策略</strong>：在某些情况下，策略模式可以支持策略之间的组合，形成更复杂的算法。通过在客户端代码中组合使用多个策略对象，可以实现算法的复合或优先级设定，以应对更复杂的业务场景。</p>
+</li>
+<li><p><strong>易于理解和复用</strong>：策略模式将每种算法封装为独立的类，每个类都有清晰的职责和边界，易于理解。由于策略类通常只包含与特定算法相关的逻辑，它们可以作为可复用的组件在不同上下文中使用，提高了代码的复用性。</p>
+</li>
+</ol>
+</blockquote>
+<p>综上所述，策略模式的主要作用在于通过将一组相关算法封装成一系列可相互替换的策略对象，使得客户端能够在运行时动态地选择和切换算法，从而实现算法的封装、切换、扩展，消除条件分支，降低系统耦合度，支持算法组合，并提高代码的可理解性和复用性。这种模式广泛应用于需要根据不同情况选择不同处理逻辑的场景，如排序算法的选择、数据校验规则的变更、支付方式的切换等。</p>
+<h2 id="代理模式-Proxy-Pattern"><a href="#代理模式-Proxy-Pattern" class="headerlink" title="代理模式(Proxy Pattern)"></a>代理模式(Proxy Pattern)</h2><p>什么是代理模式呢？我很忙，忙的没空理你，那你要找我呢就先找我的代理人吧，那代理人总要知道被代理人能做哪些事情不能做哪些事情吧，那就是两个人具备同一个接口，代理人虽然不能干活，但是被代理的人能干活呀。</p>
+<p>定义一种类型的女人，王婆和潘金莲都属于这个类型的女人：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">KindWomen</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">makeEyesWithMan</span><span class="params">()</span>; <span class="comment">//抛媚眼</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">happyWithMan</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后分别定义潘金莲和王婆两个实现类，但是王婆太老了，是个男人都看不上，所以她作为一类女人的代理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PanJinLian</span> <span class="keyword">implements</span> <span class="title class_">KindWomen</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">happyWithMan</span><span class="params">()</span> &#123; </span><br><span class="line">    System.out.println(<span class="string">&quot;潘金莲在和男人做那个.....&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">makeEyesWithMan</span><span class="params">()</span> &#123; </span><br><span class="line">    System.out.println(<span class="string">&quot;潘金莲抛媚眼&quot;</span>);</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WangPo</span> <span class="keyword">implements</span> <span class="title class_">KindWomen</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> KindWomen kindWomen;</span><br><span class="line">	<span class="keyword">public</span> <span class="title function_">WangPo</span><span class="params">()</span>&#123; <span class="comment">//默认是潘金莲的代理 </span></span><br><span class="line">    <span class="built_in">this</span>.kindWomen = <span class="keyword">new</span> <span class="title class_">PanJinLian</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//她也可以是KindWomen的任何一个女人的代理</span></span><br><span class="line">  <span class="keyword">public</span> <span class="title function_">WangPo</span><span class="params">(KindWomen kindWomen)</span>&#123;</span><br><span class="line">		<span class="built_in">this</span>.kindWomen = kindWomen; </span><br><span class="line">  &#125;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">happyWithMan</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.kindWomen.happyWithMan(); <span class="comment">//自己老了，干不了，让年轻的代替</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">makeEyesWithMan</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.kindWomen.makeEyesWithMan(); </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再定义一个西门庆，他要做：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">XiMenQing</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; </span><br><span class="line">    <span class="comment">//把王婆叫出来</span></span><br><span class="line">    <span class="type">WangPo</span> <span class="variable">wangPo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">WangPo</span>();</span><br><span class="line">    wangPo.makeEyesWithMan();</span><br><span class="line">    wangPo.happyWithMan();<span class="comment">//表面上是和王婆做，实际上却是和潘金莲 </span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="代理模式的作用"><a href="#代理模式的作用" class="headerlink" title="代理模式的作用"></a>代理模式的作用</h3><p>代理模式在软件设计中具有以下重要作用：</p>
+<blockquote>
+<ol>
+<li><p><strong>控制访问</strong>：代理模式可以作为访问控制的中间层，通过代理对象来控制对真实对象（目标对象）的访问权限。例如，安全代理可以验证用户身份、检查访问权限，只有在满足特定条件时才允许客户端访问目标对象的方法。</p>
+</li>
+<li><p><strong>增强功能</strong>：代理对象可以在调用目标对象方法前后添加额外的操作，如预处理、后处理、日志记录、性能监控、事务管理等。这种机制允许在不修改目标对象代码的情况下为其增加新功能，符合“开闭原则”。</p>
+</li>
+<li><p><strong>透明代理</strong>：代理对象与目标对象遵循相同的接口，对客户端而言是透明的。客户端无需关心与之交互的是真实对象还是代理对象，只需按照接口约定进行调用。这种封装提高了系统的灵活性，因为可以在运行时动态切换不同的代理实现。</p>
+</li>
+<li><p><strong>远程代理</strong>：代理模式可以用来实现代理对象代表远程对象执行本地方法调用。远程代理隐藏了底层网络通信、序列化&#x2F;反序列化等细节，使得客户端能够像操作本地对象一样调用远程服务。</p>
+</li>
+<li><p><strong>延迟加载（懒加载）</strong>：懒汉式单例模式就是一种典型的延迟加载代理，只有当客户端首次请求时才真正创建目标对象。这种方式可以优化系统启动速度，减少资源消耗，特别适用于那些创建成本高或并非始终需要的对象。</p>
+</li>
+<li><p><strong>缓冲与数据缓存</strong>：代理对象可以作为缓存层，存储目标对象返回的数据，当客户端重复请求相同数据时，直接从代理对象中返回，避免频繁访问目标对象，从而提高性能。</p>
+</li>
+<li><p><strong>虚拟代理</strong>：对于创建成本高或耗时长的真实对象，如大体积图像、复杂的报表等，虚拟代理可以在必要时才创建或加载真实对象，同时在加载过程中提供占位符或其他默认数据。</p>
+</li>
+<li><p><strong>解耦</strong>：代理模式通过引入代理类，将一些与主要业务逻辑无关但又需要与之关联的操作（如日志记录、异常处理、统计计数等）从目标对象中分离出来，增强了系统的模块化和可维护性。</p>
+</li>
+</ol>
+</blockquote>
+<p>综上所述，代理模式主要用于为对象提供一个替代者（代理对象），通过代理对象来间接控制对真实对象（目标对象）的访问，以此实现访问控制、功能增强、透明代理、远程服务、延迟加载、缓存、虚拟化以及解耦等多种功能。它在软件开发中是一种强大的结构型设计模式，广泛应用于各种需要对对象访问进行中介、增强或控制的场景中。</p>
+<h2 id="单例模式-Singleton-Pattern"><a href="#单例模式-Singleton-Pattern" class="headerlink" title="单例模式(Singleton Pattern)"></a>单例模式(Singleton Pattern)</h2><p>单例就是单一、独苗的意思。我们可以认为皇帝是个单例模式，在这 个场景中，有皇帝、有大臣，大臣是天天要上朝参见皇帝的，今天参拜的皇帝应该和昨天、前天的一样，大臣磕完头，抬头一看，嗨，还是昨天那个皇帝，单例模式，绝对的单例模式。</p>
+<p>先定义一个皇帝：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Emperor</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Emperor</span> <span class="variable">emperor</span> <span class="operator">=</span> <span class="literal">null</span>; <span class="comment">//定义一个皇帝放在那里</span></span><br><span class="line">	<span class="keyword">private</span> <span class="title function_">Emperor</span><span class="params">()</span>&#123;&#125; <span class="comment">//不让你产生第二个皇帝</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> Emperor <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(emperor == <span class="literal">null</span>)&#123; </span><br><span class="line">      <span class="comment">//如果皇帝还没有定义，那就定一个 </span></span><br><span class="line">      emperor = <span class="keyword">new</span> <span class="title class_">Emperor</span>();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> emperor; </span><br><span class="line">  &#125;	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">emperorInfo</span><span class="params">()</span>&#123;</span><br><span class="line">		System.out.println(<span class="string">&quot;我就是皇帝某某某....&quot;</span>); </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>单例模式很简单，就是在构造函数中多了加一个构造函数，访问权限是 private 的就可以了，这个模式是简单，但是简单中透着风险，风险？什么风险？在一个 B&#x2F;S 项目中，每个 HTTP Request 请求到 J2EE 的容器上后都创建了一个线程,每个线程都要创建同一个单例对象，怎么办？好，我们写一个通用的单例程序，然后分析一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SingletonPattern</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> SingletonPattern singletonPattern= <span class="literal">null</span>; </span><br><span class="line">	<span class="keyword">private</span> <span class="title function_">SingletonPattern</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">public</span> SingletonPattern <span class="title function_">getInstance</span><span class="params">()</span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">this</span>.singletonPattern; </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是上面的写法在多线程情况下就会出现问题，就在getInstance方法里，假如现在有两个线程 A 和线程 B，线程 A 执行到 this.singletonPattern &#x3D; new SingletonPattern()，正在申请内存分配，可能需要 0.001 微秒，就在这 0.001 微秒之内，线程 B 执行到 if(this.singletonPattern &#x3D;&#x3D; null)，这个时候判断条件是 true ，那然后呢？线程 B 也往下走，于是乎就在内存中就有两个 SingletonPattern 的实例了，看看是不是出问题了？</p>
+<p>如果你这个单例是去拿一个序列号或者创建一个信号资源的时候，就会导致业务逻辑混乱！数据一致性校验失败！最重要的是从代码上还看不出什么问题，因为这种情况基本上是重现不了的。那怎么修改？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SingletonPattern</span> &#123; </span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> SingletonPattern singletonPattern= <span class="keyword">new</span> <span class="title class_">SingletonPattern</span>();</span><br><span class="line">  <span class="keyword">private</span> <span class="title function_">SingletonPattern</span><span class="params">()</span>&#123;&#125;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">static</span> SingletonPattern <span class="title function_">getInstance</span><span class="params">()</span>&#123; </span><br><span class="line">    <span class="keyword">return</span> singletonPattern;</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直接 new 一个对象传递给类的成员变量 singletonpattern，你要的时候 getInstance()直接返回给你，解决问题！</p>
+<h3 id="单例模式的作用"><a href="#单例模式的作用" class="headerlink" title="单例模式的作用"></a>单例模式的作用</h3><p>单例模式在软件工程中具有以下重要作用：</p>
+<blockquote>
+<ol>
+<li><p><strong>确保唯一实例</strong>：单例模式的核心目标是确保一个类在整个应用程序的生命周期内只创建一个实例。通过精心设计的构造函数私有化、静态成员变量持有唯一实例以及提供一个公共的静态方法（通常称为“getInstance”）来获取该实例，有效地阻止了外部代码通过常规途径多次实例化该类。</p>
+</li>
+<li><p><strong>资源优化与共享</strong>：对于那些需要消耗大量系统资源（如数据库连接、文件句柄、硬件设备访问权限等）或者创建成本较高的对象，使用单例模式可以避免不必要的资源浪费。单一实例使得多个客户端可以共享同一资源，节省内存、磁盘空间、网络连接等资源，特别是对于那些全局状态管理、线程池、缓存、日志记录等场景尤为适用。</p>
+</li>
+<li><p><strong>协调系统状态</strong>：当一个类负责协调系统中全局状态或行为时，确保其全局唯一性至关重要。例如，充当系统配置管理器、事件调度中心、注册表服务等角色的类，通常需要以单例形式存在，以避免因多个实例导致的数据不一致或竞态条件。</p>
+</li>
+<li><p><strong>控制复杂性</strong>：单例模式有助于简化复杂系统的整体设计。由于单例对象的生命周期由类本身控制，开发者不需要在各处手动管理对象的创建、销毁和传递，减少了对象生命周期管理的复杂性，有利于提高代码的可读性和可维护性。</p>
+</li>
+<li><p><strong>保证一致性</strong>：对于需要维持全局状态一致性的应用，如序列号生成器、数据库连接池等，单例模式可以确保所有客户端都通过同一入口访问同一对象，避免了因多个实例导致的状态冲突或不一致。</p>
+</li>
+<li><p><strong>简化并行与分布式环境下的同步问题</strong>：在多线程或多进程环境中，如果某个类的实例必须是唯一的，直接使用单例模式可以避免不同线程或进程各自创建实例而引起的同步问题。单例的实现通常包含适当的同步机制（如双重检查锁定），确保在并发环境下也能正确地创建和返回单个实例。</p>
+</li>
+<li><p><strong>易于测试</strong>：在单元测试中，有时需要替换实际的单例对象为测试专用的模拟对象。良好的单例设计通常会提供一种方式（如通过依赖注入、设置静态开关等）来允许测试代码临时替换或重新初始化单例实例，便于进行隔离测试。</p>
+</li>
+</ol>
+</blockquote>
+<p>综上所述，单例模式的主要作用在于通过限制类的实例化次数为一次，实现资源的有效管理和共享，保证系统状态的一致性，简化对象生命周期管理，以及为复杂系统设计提供一种全局协调机制。它在许多需要控制全局唯一访问点、优化资源使用或维护系统状态的应用场景中发挥着关键作用。</p>
+<h2 id="工厂方法模式-Factory-Method-Pattern"><a href="#工厂方法模式-Factory-Method-Pattern" class="headerlink" title="工厂方法模式(Factory Method Pattern)"></a>工厂方法模式(Factory Method Pattern)</h2><p>假设女娲造人的时候创建了一个工厂，根据这个工厂不断的造黑人、黄人、白人。</p>
+<p>先定义人类的总称：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Human</span> &#123; </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">laugh</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cry</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">talk</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后定义具体的人种，这里就省略掉了，就是三个实现类分别实现Human的方法。</p>
+<p>再就是工厂了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HumanFactory</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Human <span class="title function_">createHuman</span><span class="params">(Class c)</span>&#123;</span><br><span class="line">        <span class="type">Human</span> <span class="variable">human</span> <span class="operator">=</span> <span class="literal">null</span>; <span class="comment">//定义一个类型的人类 </span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            human = (Human)Class.forName(c.getName()).newInstance(); <span class="comment">//产生一个人种</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InstantiationException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;必须指定人种的颜色&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;人种定义错误!&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123; </span><br><span class="line">            System.out.println(<span class="string">&quot;你指定的人种找不到!&quot;</span>); </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> human; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后再定义女娲：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NvWa</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>&#123;</span><br><span class="line">        <span class="type">Human</span> <span class="variable">yellow</span> <span class="operator">=</span> HumanFactory.createHuman(YellowHuman.class);</span><br><span class="line">        yellow.laugh();</span><br><span class="line">        yellow.cry();</span><br><span class="line">        yellow.talk();</span><br><span class="line">      <span class="comment">//也可按照同样的写法创建其他人种</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="工厂方法模式的作用"><a href="#工厂方法模式的作用" class="headerlink" title="工厂方法模式的作用"></a>工厂方法模式的作用</h3><p>工厂方法模式是一种创建型设计模式，其在软件工程领域具有以下几个主要作用：</p>
+<blockquote>
+<ol>
+<li><p><strong>延迟对象创建</strong>：工厂方法模式将对象的创建过程封装在工厂类或子类中，通过调用工厂方法来创建所需对象，而不是直接使用 <code>new</code> 关键字在客户端代码中显式实例化。这样实现了对象创建的延迟，即具体的对象类型在运行时才确定，提高了程序的灵活性。</p>
+</li>
+<li><p><strong>解耦客户端与具体产品类</strong>：通过引入工厂接口（或抽象类），客户端代码无需了解或依赖具体产品类的细节。客户端只需与工厂接口交互，请求创建对象，而具体的对象类型和创建逻辑由工厂子类来实现。这样降低了客户端与具体产品类之间的耦合度，使得两者可以独立变化，提高系统的可维护性和可扩展性。</p>
+</li>
+<li><p><strong>支持多态产品对象创建</strong>：由于工厂方法通常在工厂子类中实现，不同的工厂子类可以创建不同类型的对象。这意味着客户端可以通过使用相同的工厂接口，根据需要选择不同的工厂子类来创建相应的产品对象。这种多态性增强了系统的灵活性，使得在不修改客户端代码的情况下，能够添加新产品类型或更换产品实现。</p>
+</li>
+<li><p><strong>便于对象的管理和配置</strong>：使用工厂方法模式，可以在工厂类或配置文件中集中管理对象的创建逻辑和依赖关系，便于进行全局的配置和调整。例如，可以根据不同的环境或用户需求，轻松切换产品对象的实现，如使用不同的数据库驱动、选择不同的日志记录器等。</p>
+</li>
+<li><p><strong>应对需求变化和代码复用</strong>：当业务需求发生变化时，如果涉及到产品类的变化，只需新增或修改相应的工厂子类即可，不会影响到使用工厂方法创建对象的客户端代码。同时，对于创建过程复杂的对象，工厂方法可以封装重复的初始化逻辑，减少代码重复，提升代码的复用性。</p>
+</li>
+<li><p><strong>防止对象创建代码散乱</strong>：在大型项目中，如果对象创建代码分散在各个模块或函数中，会使得代码难以管理和维护。工厂方法模式将对象创建集中化，有助于保持代码的整洁性和组织性，方便团队协作和代码审查。</p>
+</li>
+</ol>
+</blockquote>
+<p>总结来说，工厂方法模式的主要作用在于通过提供一个创建对象的通用接口，将对象的实例化过程封装并委托给子类实现，从而实现对象创建的延迟、客户端与具体产品类的解耦、多态产品对象的创建，以及对对象创建过程的集中管理和配置，增强软件系统的灵活性、可扩展性、可维护性和代码质量。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="魚 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="魚 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/f8ab35c0/" rel="prev" title="JavaScript进阶题">
+                  <i class="fa fa-angle-left"></i> JavaScript进阶题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/e86d771b/" rel="next" title="算法刷题">
+                  算法刷题 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC81OTcxMi8zNjE3NA=="></div>
+</div>
+  </main>
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">魚</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:17</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>
+  <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+  <script async src="/js/cursor/explosion.min.js"></script>
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

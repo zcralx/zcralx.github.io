@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha256-wiz7ZSCn/btzhjKDQBms9Hx4sSeUYsDrTLg7roPstac=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zcralx.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.19.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"show_result":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Docker入门安装brew install --cask --appdir&#x3D;&#x2F;Applications docker docker version查看详细信息 设置镜像源  “registry-mirrors”: [    “https:&#x2F;&#x2F;docker.m.daocloud.io“,    “https:&#x2F;&#x2F;docker.nju.edu.cn“,    “https:&#x2F;&#x2F;dockerproxy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker">
+<meta property="og:url" content="https://zcralx.github.io/posts/f5f9fa9b/index.html">
+<meta property="og:site_name" content="zcralx&#39;s blog">
+<meta property="og:description" content="Docker入门安装brew install --cask --appdir&#x3D;&#x2F;Applications docker docker version查看详细信息 设置镜像源  “registry-mirrors”: [    “https:&#x2F;&#x2F;docker.m.daocloud.io“,    “https:&#x2F;&#x2F;docker.nju.edu.cn“,    “https:&#x2F;&#x2F;dockerproxy">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-04-26T07:04:20.000Z">
+<meta property="article:modified_time" content="2024-06-05T13:46:22.113Z">
+<meta property="article:author" content="魚">
+<meta property="article:tag" content="java,c++,Go,rust,python">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://zcralx.github.io/posts/f5f9fa9b/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zcralx.github.io/posts/f5f9fa9b/","path":"posts/f5f9fa9b/","title":"Docker"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Docker | zcralx's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">zcralx's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">多喜乐，长安宁，愿你一切都好</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">29</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">12</span></a></li><li class="menu-item menu-item-象棋"><a href="/xiangqi/" rel="section"><i class="fa fa-chess-rook fa-fw"></i>象棋</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+  
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker%E5%85%A5%E9%97%A8"><span class="nav-number">1.</span> <span class="nav-text">Docker入门</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%95%9C%E5%83%8F"><span class="nav-number">1.2.</span> <span class="nav-text">获取镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F"><span class="nav-number">1.2.1.</span> <span class="nav-text">删除镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E5%AE%B9%E5%99%A8"><span class="nav-number">1.3.</span> <span class="nav-text">操作容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%92%8C%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">1.3.1.</span> <span class="nav-text">创建和运行容器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%88%E6%8A%A4%E6%80%81%E8%BF%90%E8%A1%8C"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">守护态运行</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#attach"><span class="nav-number">1.3.1.1.1.</span> <span class="nav-text">attach</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#exec"><span class="nav-number">1.3.1.1.2.</span> <span class="nav-text">exec</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#nsenter%E5%B7%A5%E5%85%B7"><span class="nav-number">1.3.1.1.3.</span> <span class="nav-text">nsenter工具</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%88%E6%AD%A2%E4%B8%8E%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">终止与启动容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%AE%B9%E5%99%A8"><span class="nav-number">1.3.3.</span> <span class="nav-text">删除容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E5%92%8C%E5%AF%BC%E5%87%BA%E5%AE%B9%E5%99%A8"><span class="nav-number">1.3.4.</span> <span class="nav-text">导入和导出容器</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="魚"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">魚</p>
+  <div class="site-description" itemprop="description">yuyu6661@foxmail.com</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zcralx" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zcralx" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/zzzzzzzzzzz-90-37" title="zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;zzzzzzzzzzz-90-37" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zcralx.github.io/posts/f5f9fa9b/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="魚">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zcralx's blog">
+      <meta itemprop="description" content="yuyu6661@foxmail.com">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Docker | zcralx's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-04-26 15:04:20" itemprop="dateCreated datePublished" datetime="2024-04-26T15:04:20+08:00">2024-04-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-06-05 21:46:22" itemprop="dateModified" datetime="2024-06-05T21:46:22+08:00">2024-06-05</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Docker入门"><a href="#Docker入门" class="headerlink" title="Docker入门"></a>Docker入门</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><code>brew install --cask --appdir=/Applications docker</code></p>
+<p><code>docker version</code>查看详细信息</p>
+<p>设置镜像源</p>
+<blockquote>
+<p>“registry-mirrors”: [<br>    “<a target="_blank" rel="noopener" href="https://docker.m.daocloud.io/">https://docker.m.daocloud.io</a>“,<br>    “<a target="_blank" rel="noopener" href="https://docker.nju.edu.cn/">https://docker.nju.edu.cn</a>“,<br>    “<a target="_blank" rel="noopener" href="https://dockerproxy.com/">https://dockerproxy.com</a>“<br>  ]</p>
+</blockquote>
+<h2 id="获取镜像"><a href="#获取镜像" class="headerlink" title="获取镜像"></a>获取镜像</h2><p><code>docker pull xxxx</code>默认latest版本，镜像的仓库名称中还应该添加仓库地址（即registry，注册服务器）作为前缀，只是我们默认使用的是Docker Hub服务，该前缀可以忽略。</p>
+<p>从非官方源拉取：docker pull hub.c.163.com&#x2F;public&#x2F;ubuntu:14.04</p>
+<p>查看镜像信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">% docker images</span><br><span class="line">REPOSITORY  TAG    IMAGE ID    CREATED    SIZE</span><br><span class="line">nginx    latest  786a14303c96  2 days ago  193MB</span><br><span class="line">python    3.8    99e30d37509d  5 weeks ago  1GB</span><br></pre></td></tr></table></figure>
+
+<p>为本地镜像任意添加新的标签<code>docker tag python:3.8 mypython:3.8</code></p>
+<p>执行之后再列出镜像信息会多出一个镜像，但是它和原镜像实际指向同一个镜像文件，只是别名不同而已。</p>
+<p><code>docker inspect xxxx</code>查看xxxx镜像详细信息</p>
+<p><code>docker history xxxx</code> 查看镜像历史</p>
+<p>docker search命令可以搜索远端仓库中共享的镜像</p>
+<h3 id="删除镜像"><a href="#删除镜像" class="headerlink" title="删除镜像"></a>删除镜像</h3><p><code>docker rmi mypython:3.8</code></p>
+<p>当同一个镜像拥有多个标签的时候，docker rmi命令只是删除该镜像多个标签中的指定标签而已，并不影响镜像文件</p>
+<p>但当镜像只剩下一个标签的时候就要小心了，此时再使用docker rmi命令会彻底删除镜像。</p>
+<p><code>docker rmi +镜像id</code> 会先尝试删除所有指向该镜像的标签，然后删除该镜像文件本身。</p>
+<p>当有该镜像创建的容器存在时，镜像文件默认是无法被删除的</p>
+<h2 id="操作容器"><a href="#操作容器" class="headerlink" title="操作容器"></a>操作容器</h2><h3 id="创建和运行容器"><a href="#创建和运行容器" class="headerlink" title="创建和运行容器"></a>创建和运行容器</h3><p>使用docker create命令新建一个容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">% docker create -it python:3.8</span><br><span class="line">845c0fae8bef1a9f65c77af13a795836ce82186a0d03848681133aac53b359e3</span><br></pre></td></tr></table></figure>
+
+<p>docker ps -a命令可以看到本机上存在的所有容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">% docker ps -a</span><br><span class="line">CONTAINER ID   IMAGE        COMMAND     CREATED              STATUS    PORTS     NAMES</span><br><span class="line">845c0fae8bef   python:3.8   &quot;python3&quot;   About a minute ago   Created             festive_easley</span><br></pre></td></tr></table></figure>
+
+<p>使用docker create命令新建的容器处于停止状态，使用docker start命令来启动它，使用docker ps查看运行中的容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">% docker start 845c0fae8bef</span><br><span class="line">845c0fae8bef</span><br><span class="line">% docker ps</span><br><span class="line">CONTAINER ID   IMAGE        COMMAND     CREATED         STATUS          PORTS     NAMES</span><br><span class="line">845c0fae8bef   python:3.8   &quot;python3&quot;   6 minutes ago   Up 14 seconds             festive_easley</span><br></pre></td></tr></table></figure>
+
+<p>当然也可以直接新建并启动容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">% docker run -it python:3.8 /bin/bash 启动一个bash终端，允许用户进行交互</span><br><span class="line">root@ae2d080e12d6:/# </span><br></pre></td></tr></table></figure>
+
+<p>-t选项让Docker分配一个伪终端并绑定到容器的标准输入上，-i则让容器的标准输入保持打开。</p>
+<p>在交互模式下，用户可以通过所创建的终端来输入命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/# ls</span><br><span class="line">bin  boot  dev	etc  home  lib	media  mnt  opt  proc  root  run  sbin	srv  sys  tmp  usr  var</span><br><span class="line">/# ps 查看进程</span><br><span class="line">  PID TTY          TIME CMD</span><br><span class="line">    1 pts/0    00:00:00 bash</span><br><span class="line">    8 pts/0    00:00:00 ps</span><br></pre></td></tr></table></figure>
+
+<p>当利用docker run来创建并启动容器时，Docker在后台运行的标准操作包括：</p>
+<blockquote>
+<p>检查本地是否存在指定的镜像，不存在就从公有仓库下载；</p>
+<p>利用镜像创建一个容器，并启动该容器；</p>
+<p>分配一个文件系统给容器，并在只读的镜像层外面挂载一层可读写层；</p>
+<p>从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中；</p>
+<p>从网桥的地址池配置一个IP地址给容器；</p>
+<p>执行用户指定的应用程序；</p>
+<p>执行完毕后容器被自动终止。</p>
+</blockquote>
+<p>输入exit命令来退出容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/# exit</span><br><span class="line">exit</span><br></pre></td></tr></table></figure>
+
+<h4 id="守护态运行"><a href="#守护态运行" class="headerlink" title="守护态运行"></a>守护态运行</h4><p>添加-d参数让Docker容器在后台以守护态（Daemonized）形式运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d ubuntu  /bin/sh -c &quot;while true; do echo hello world; sleep 1; done&quot;</span><br><span class="line">...</span><br><span class="line">$ docker logs ce5获取输出信息，ce5是id的简写</span><br><span class="line">hello world</span><br><span class="line">hello world</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>这个时候如果需要进入容器进行操作，有多种方法，包括使用官方的attach或exec命令，以及第三方的nsenter工具等。</p>
+<h5 id="attach"><a href="#attach" class="headerlink" title="attach"></a>attach</h5><p><code>docker attach [--detach-keys[=[]]] [--no-stdin] [--sig-proxy[=true]] CONTAINER</code></p>
+<blockquote>
+<p>支持三个主要选项：<br>–detach-keys[&#x3D;[]]：指定退出attach模式的快捷键序列，默认是CTRL-p CTRL-q；<br>–no-stdin&#x3D;true|false：是否关闭标准输入，默认是保持打开；<br>–sig-proxy&#x3D;true|false：是否代理收到的系统信号给应用进程，默认为true。</p>
+</blockquote>
+<p>但是当多个窗口同时用attach命令连到同一个容器的时候，所有窗口都会同步显示。当某个窗口因命令阻塞时，其他窗口也无法执行操作了。</p>
+<h5 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h5><p><code>docker exec [-d|--detach] [--detach-keys[=[]]] [-i|--interactive] [--privileged] [-t|--tty] [-u|--user[=USER]] CONTAINER COMMAND [ARG...]</code></p>
+<blockquote>
+<p>-i，–interactive&#x3D;true|false：打开标准输入接受用户输入命令，默认为false；<br>–privileged&#x3D;true|false：是否给执行命令以高权限，默认为false；<br>-t，–tty&#x3D;true|false：分配伪终端，默认为false；<br>-u，–user&#x3D;””：执行命令的用户名或ID。</p>
+</blockquote>
+<p>例如进入到刚创建的容器中，并启动一个bash：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker exec -it 243c32535da7 /bin/bash</span><br><span class="line">root@243c32535da7:/#</span><br></pre></td></tr></table></figure>
+
+<p>exec是最推荐的方式。</p>
+<h5 id="nsenter工具"><a href="#nsenter工具" class="headerlink" title="nsenter工具"></a>nsenter工具</h5><p>懒得看</p>
+<h3 id="终止与启动容器"><a href="#终止与启动容器" class="headerlink" title="终止与启动容器"></a>终止与启动容器</h3><p><code>docker stop[-t|--time[=10]][CONTAINER...]</code></p>
+<p>首先向容器发送SIGTERM信号，等待一段超时时间（默认为10秒）后，再发送SIGKILL信号来终止容器。</p>
+<p>docker kill命令会直接发送SIGKILL信号来强行终止容器。</p>
+<p>此外，当Docker容器中指定的应用终结时，容器也会自动终止。例如对于上面只启动了一个终端的容器，用户通过exit命令或Ctrl+d来退出终端时，所创建的容器立刻终止，处于stopped状态。</p>
+<p>查看所有容器的id</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> % docker ps -qa</span><br><span class="line">ae2d080e12d6</span><br><span class="line">845c0fae8bef</span><br></pre></td></tr></table></figure>
+
+<p>处于终止状态的容器，可以通过docker start命令来重新启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">% docker start ae2</span><br><span class="line">ae2</span><br></pre></td></tr></table></figure>
+
+<p>docker restart命令会将一个运行态的容器先终止，然后再重新启动它。</p>
+<h3 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h3><p>直接打开docker desktop删除就行。</p>
+<p><code>docker rm[-f|--force][-l|--link][-v|--volumes]CONTAINER[CONTAINER...]</code></p>
+<blockquote>
+<p>-f，–force&#x3D;false：是否强行终止并删除一个运行中的容器；<br>-l，–link&#x3D;false：删除容器的连接，但保留容器；<br>-v，–volumes&#x3D;false：删除容器挂载的数据卷。</p>
+</blockquote>
+<h3 id="导入和导出容器"><a href="#导入和导出容器" class="headerlink" title="导入和导出容器"></a>导入和导出容器</h3><p>导出一个已经创建的容器到一个文件<code>docker export[-o|--output[=&quot;&quot;]]CONTAINER</code>，-o选项来指定导出的tar文件名，也可以直接通过重定向来实现。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker export -o test_for_run.tar ce5</span><br></pre></td></tr></table></figure>
+
+<p>导出的文件又可以使用docker import命令导入变成镜像<code>docker import [-c|--change[=[]]] [-m|--message[=MESSAGE]] file|URL|-[REPOSITORY [:TAG]]</code></p>
+<p>可以通过-c，–change&#x3D;[]选项在导入的同时执行对容器进行修改的Dockerfile指令。</p>
+<p>既可以使用docker load命令来导入镜像存储文件到本地镜像库，也可以使用docker import命令来导入一个容器快照到本地镜像库。</p>
+<p>这两者的区别在于容器快照文件将丢弃所有的历史记录和元数据信息（即仅保存容器当时的快照状态），而镜像存储文件将保存完整记</p>
+<p>录，体积也更大。此外，从容器快照文件导入时可以重新指定标签等元数据信息。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="魚 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="魚 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/62d904b9/" rel="prev" title="Spring框架">
+                  <i class="fa fa-angle-left"></i> Spring框架
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/0/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC81OTcxMi8zNjE3NA=="></div>
+</div>
+  </main>
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">魚</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">109k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:17</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas>
+  <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+  <script async src="/js/cursor/explosion.min.js"></script>
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
